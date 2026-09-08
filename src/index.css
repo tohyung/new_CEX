@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --up-green: #0ecb81;
+    --down-red: #f6465d;
+    --bg-primary: #0b0e14;
+    --bg-secondary: #12161f;
+    --bg-tertiary: #191f2d;
+    --border-color: #232938;
+    --tr-black: #000000;
+    --tr-card: #0e0e11;
+    --tr-border: #1d1d22;
+  }
+
+  body {
+    font-family: 'DM Sans', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.015em;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Trade Republic Custom Typeface Clone (Dinamo / ABC Favorit inspired) */
+.font-republic {
+  font-family: 'DM Sans', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-feature-settings: "cv05" 1, "cv11" 1, "ss01" 1, "tnum" 1;
+  letter-spacing: -0.025em;
+}
+
+.font-republic-display {
+  font-family: 'DM Sans', 'Plus Jakarta Sans', sans-serif;
+  font-feature-settings: "cv05" 1, "cv11" 1, "ss01" 1, "tnum" 1;
+  letter-spacing: -0.038em;
+  font-weight: 700;
+}
+
+.font-republic-mono {
+  font-family: 'DM Sans', 'Plus Jakarta Sans', monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Custom terminal scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #0d111a;
+}
+::-webkit-scrollbar-thumb {
+  background: #252d3d;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #394459;
+}
+
+@keyframes flash-green {
+  0% { background-color: rgba(14, 203, 129, 0.3); }
+  100% { background-color: transparent; }
+}
+
+@keyframes flash-red {
+  0% { background-color: rgba(246, 70, 93, 0.3); }
+  100% { background-color: transparent; }
+}
+
+.flash-up {
+  animation: flash-green 0.6s ease-out;
+}
+
+.flash-down {
+  animation: flash-red 0.6s ease-out;
+}
+
+@keyframes green-glow-pulse {
+  0%, 100% {
+    opacity: 0.70;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.90;
+    transform: scale(1.03);
+  }
+}
+
+.animate-green-zone {
+  animation: green-glow-pulse 7s ease-in-out infinite;
+}
+
