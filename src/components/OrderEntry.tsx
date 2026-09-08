@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Percent, 
   ShieldAlert, 
@@ -8,7 +8,10 @@ import {
   ArrowRight,
   Settings,
   SlidersHorizontal,
-  Check
+  Check,
+  Search,
+  Maximize2,
+  X
 } from 'lucide-react';
 import { TradingPair, TradingMode, OrderSide, OrderType, MarginType, AssetBalance } from '../types';
 import { playSound } from '../utils/sound';
@@ -54,6 +57,8 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
   const [stopPriceInput, setStopPriceInput] = useState<string>('');
   const [amountInput, setAmountInput] = useState<string>('');
   const [sliderPercent, setSliderPercent] = useState<number>(0);
+  const [validationHint, setValidationHint] = useState<string | null>(null);
+  const amountInputRef = useRef<HTMLInputElement>(null);
 
   // Perps / Futures settings
   const [leverage, setLeverage] = useState<number>(10);
@@ -65,10 +70,19 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
   const [takeProfitInput, setTakeProfitInput] = useState<string>('');
   const [stopLossInput, setStopLossInput] = useState<string>('');
 
+  // Sync price when pair changes
+  useEffect(() => {
+    setPriceInput(currentPrice.toFixed(pair.precision));
+    setAmountInput('');
+    setSliderPercent(0);
+    setValidationHint(null);
+  }, [pair.symbol]);
+
   // Update price when clicked from order book
   useEffect(() => {
     if (selectedPriceFromBook !== null && selectedPriceFromBook > 0) {
       setPriceInput(selectedPriceFromBook.toFixed(pair.precision));
+      setValidationHint(null);
     }
   }, [selectedPriceFromBook, pair.precision]);
 
@@ -76,6 +90,7 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
   useEffect(() => {
     if (selectedAmountFromBook !== null && selectedAmountFromBook > 0) {
       setAmountInput(selectedAmountFromBook.toFixed(pair.qtyPrecision));
+      setValidationHint(null);
     }
   }, [selectedAmountFromBook, pair.qtyPrecision]);
 
@@ -93,13 +108,16 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
     ? (availableUsdt * leverage) / (effectivePrice || 1)
     : availableBase;
 
-  // Percentage buttons handler
+  // Percentage buttons handler with floor rounding to avoid 'insufficient funds' precision errors
   const handlePercentage = (pct: number) => {
     playSound('click');
     setSliderPercent(pct);
+    setValidationHint(null);
     const max = side === 'buy' ? maxBuyBase : maxSellBase;
     const calc = (max * (pct / 100));
-    setAmountInput(calc.toFixed(pair.qtyPrecision));
+    const factor = Math.pow(10, pair.qtyPrecision);
+    const truncated = Math.floor(calc * factor) / factor;
+    setAmountInput(truncated.toFixed(pair.qtyPrecision));
   };
 
   const parsedAmount = Number(amountInput) || 0;
@@ -115,12 +133,26 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
       : parsedPrice * (1 + (1 / leverage) * 0.9)
     : null;
 
-  // Submission handler
+  // Submission handler with direct validation and interactive guidance
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (parsedAmount <= 0) return;
-    if (orderType !== 'market' && parsedPrice <= 0) return;
+    if (parsedAmount <= 0) {
+      setValidationHint(`Please enter an amount of ${pair.baseAsset} to ${side === 'buy' ? 'buy' : 'sell'}`);
+      amountInputRef.current?.focus();
+      return;
+    }
+    if (orderType !== 'market' && parsedPrice <= 0) {
+      setValidationHint('Please specify a valid limit price');
+      return;
+    }
 
+    const max = side === 'buy' ? maxBuyBase : maxSellBase;
+    if (parsedAmount > max * 1.0001) {
+      setValidationHint(`Amount exceeds your available ${side === 'buy' ? 'USDT' : pair.baseAsset} balance`);
+      return;
+    }
+
+    setValidationHint(null);
     onSubmitOrder({
       side,
       type: orderType,
@@ -141,45 +173,48 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
   const leverageSteps = [1, 2, 5, 10, 20, 50, 75, 100].filter(l => l <= pair.maxLeverage);
 
   return (
-    <div className="flex flex-col shrink-0 bg-white/[0.035] backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.37),inset_0_1px_0_0_rgba(255,255,255,0.05)] overflow-hidden text-xs select-none font-republic">
-      {/* Top Header: Spot / Futures Mode Switcher with Gear Icon in top right */}
-      <div className="px-3 py-2 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between">
-        {/* Spot vs Futures mode selector */}
-        <div className="flex items-center bg-white/[0.04] p-0.5 rounded-xl border border-white/[0.08]">
-          <button
-            id="order-mode-spot-btn"
-            type="button"
-            onClick={() => {
-              playSound('click');
-              onModeChange?.('spot');
-            }}
-            className={`px-3 py-1 rounded-lg text-xs font-republic-display font-bold transition-all ${
-              mode === 'spot'
-                ? 'bg-white text-black shadow-xs'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            Spot
-          </button>
-          <button
-            id="order-mode-futures-btn"
-            type="button"
-            onClick={() => {
-              playSound('click');
-              onModeChange?.('perps');
-            }}
-            className={`px-3 py-1 rounded-lg text-xs font-republic-display font-bold transition-all flex items-center space-x-1 ${
-              mode === 'perps'
-                ? 'bg-white text-black shadow-xs'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <span>Futures</span>
-          </button>
+    <div className="h-full flex flex-col bg-white/[0.035] backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.37),inset_0_1px_0_0_rgba(255,255,255,0.05)] overflow-hidden text-xs select-none font-republic">
+      {/* Terminal Title Bar */}
+      <div className="flex items-center justify-between px-3 py-2 bg-white/[0.02] border-b border-white/[0.08] select-none">
+        <div className="flex items-center space-x-2">
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+            Order Entry
+          </span>
+          <div className="flex items-center bg-white/[0.04] p-0.5 rounded-lg border border-white/[0.08]">
+            <button
+              id="order-mode-spot-btn"
+              type="button"
+              onClick={() => {
+                playSound('click');
+                onModeChange?.('spot');
+              }}
+              className={`px-2.5 py-0.5 rounded-md text-[11px] font-republic-display font-bold transition-all ${
+                mode === 'spot'
+                  ? 'bg-white text-black shadow-xs'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Spot
+            </button>
+            <button
+              id="order-mode-futures-btn"
+              type="button"
+              onClick={() => {
+                playSound('click');
+                onModeChange?.('perps');
+              }}
+              className={`px-2.5 py-0.5 rounded-md text-[11px] font-republic-display font-bold transition-all flex items-center space-x-1 ${
+                mode === 'perps'
+                  ? 'bg-white text-black shadow-xs'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <span>Futures</span>
+            </button>
+          </div>
         </div>
 
-        {/* Top Right Corner: Margin indicator + Gear Icon */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1 text-gray-500">
           {mode === 'perps' && (
             <button
               type="button"
@@ -187,24 +222,20 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
                 playSound('click');
                 setShowLeverageModal(true);
               }}
-              className="flex items-center space-x-1.5 text-[10px] font-republic-mono text-gray-300 bg-white/[0.04] hover:bg-white/[0.08] px-2 py-0.5 rounded-lg border border-white/[0.08] transition-colors"
+              className="flex items-center space-x-1 text-[10px] font-republic-mono text-gray-300 bg-white/[0.04] hover:bg-white/[0.08] px-1.5 py-0.5 rounded border border-white/[0.08] transition-colors mr-1"
             >
               <span className="capitalize text-gray-400">{marginType}</span>
               <span className="text-emerald-400 font-bold">{leverage}x</span>
             </button>
           )}
-
-          <button
-            id="order-margin-gear-btn"
-            type="button"
-            onClick={() => {
-              playSound('click');
-              setShowLeverageModal(true);
-            }}
-            title="Configure Margin & Leverage"
-            className="p-1.5 text-gray-400 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.20] rounded-xl transition-all active:scale-95"
-          >
+          <button onClick={() => setShowLeverageModal(true)} className="p-1 hover:text-gray-300 rounded transition-colors" title="Settings">
             <Settings className="w-3.5 h-3.5" />
+          </button>
+          <button className="p-1 hover:text-gray-300 rounded transition-colors" title="Maximize">
+            <Maximize2 className="w-3.5 h-3.5" />
+          </button>
+          <button className="p-1 hover:text-gray-300 rounded transition-colors" title="Close">
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
@@ -320,32 +351,36 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
       <div className="grid grid-cols-2 p-1.5 bg-white/[0.02] border-b border-white/[0.08] gap-1.5">
         <button
           id="order-side-buy-btn"
+          type="button"
           onClick={() => {
             playSound('click');
             setSide('buy');
+            setValidationHint(null);
           }}
-          className={`py-2 text-xs font-bold rounded-lg transition-all ${
+          className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
             side === 'buy'
               ? 'bg-[#10b981] text-black font-extrabold shadow-sm'
               : 'text-gray-400 hover:text-white bg-[#161c28]'
           }`}
         >
-          {mode === 'perps' ? 'Open Long' : `Buy ${pair.baseAsset}`}
+          {mode === 'perps' ? 'Long' : 'Buy'}
         </button>
 
         <button
           id="order-side-sell-btn"
+          type="button"
           onClick={() => {
             playSound('click');
             setSide('sell');
+            setValidationHint(null);
           }}
-          className={`py-2 text-xs font-bold rounded-lg transition-all ${
+          className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
             side === 'sell'
               ? 'bg-[#f43f5e] text-white font-extrabold shadow-sm'
               : 'text-gray-400 hover:text-white bg-[#161c28]'
           }`}
         >
-          {mode === 'perps' ? 'Open Short' : `Sell ${pair.baseAsset}`}
+          {mode === 'perps' ? 'Short' : 'Sell'}
         </button>
       </div>
 
@@ -371,7 +406,7 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
       </div>
 
       {/* Form Content */}
-      <form onSubmit={handleSubmit} className="p-2.5 space-y-2">
+      <form onSubmit={handleSubmit} className="flex-1 min-h-0 flex flex-col justify-between overflow-y-auto custom-scrollbar p-2.5 space-y-2">
         <div className="space-y-2">
           {/* Available balance indicator */}
           <div className="flex items-center justify-between text-[11px] text-gray-400">
@@ -461,6 +496,7 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
 
             <div className="flex items-center bg-[#161c28] border border-[#1e2330] rounded-lg px-2.5 py-1.5 focus-within:border-white transition-colors">
               <input
+                ref={amountInputRef}
                 id="order-amount-input"
                 type="number"
                 step="any"
@@ -468,10 +504,10 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
                 onChange={(e) => {
                   setAmountInput(e.target.value);
                   setSliderPercent(0);
+                  setValidationHint(null);
                 }}
                 placeholder="0.00"
                 className="w-full bg-transparent font-republic-mono text-white text-xs focus:outline-none"
-                required
               />
               <span className="text-[10px] text-gray-300 font-republic-mono ml-2 font-bold">
                 {pair.baseAsset}
@@ -575,20 +611,45 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
             </div>
           </div>
 
+          {/* Validation Feedback Hint if user clicks without amount or exceeds balance */}
+          {validationHint && (
+            <div className="text-[10px] text-amber-300 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1.5 rounded-lg flex items-center justify-between animate-fadeIn">
+              <span>{validationHint}</span>
+              {side === 'buy' && maxBuyBase > 0 && (
+                <button
+                  type="button"
+                  onClick={() => handlePercentage(100)}
+                  className="text-[9px] underline text-amber-200 font-bold ml-2 hover:text-white cursor-pointer"
+                >
+                  Set 100%
+                </button>
+              )}
+            </div>
+          )}
+
           {/* Big Action Submit Button */}
           <button
             id="order-submit-btn"
             type="submit"
-            disabled={parsedAmount <= 0}
-            className={`w-full py-2.5 rounded-xl font-extrabold text-xs transition-all shadow-md active:scale-98 disabled:opacity-40 disabled:cursor-not-allowed ${
+            className={`w-full py-2.5 rounded-xl font-extrabold text-xs transition-all shadow-md active:scale-98 flex items-center justify-center space-x-1.5 cursor-pointer ${
               side === 'buy'
-                ? 'bg-[#10b981] hover:bg-[#0ea371] text-black shadow-[#10b981]/20'
-                : 'bg-[#f43f5e] hover:bg-[#e11d48] text-white shadow-[#f43f5e]/20'
+                ? parsedAmount <= 0
+                  ? 'bg-[#10b981]/90 hover:bg-[#10b981] text-black shadow-[#10b981]/20'
+                  : 'bg-[#10b981] hover:bg-[#0ea371] text-black shadow-[#10b981]/25'
+                : parsedAmount <= 0
+                  ? 'bg-[#f43f5e]/90 hover:bg-[#f43f5e] text-white shadow-[#f43f5e]/20'
+                  : 'bg-[#f43f5e] hover:bg-[#e11d48] text-white shadow-[#f43f5e]/25'
             }`}
           >
-            {side === 'buy' 
-              ? (mode === 'perps' ? `Buy / Long ${pair.baseAsset}` : `Buy ${pair.baseAsset}`) 
-              : (mode === 'perps' ? `Sell / Short ${pair.baseAsset}` : `Sell ${pair.baseAsset}`)}
+            <span>
+              {parsedAmount <= 0
+                ? (side === 'buy' 
+                    ? (mode === 'perps' ? `Enter Amount to Long ${pair.baseAsset}` : `Enter Amount to Buy ${pair.baseAsset}`) 
+                    : (mode === 'perps' ? `Enter Amount to Short ${pair.baseAsset}` : `Enter Amount to Sell ${pair.baseAsset}`))
+                : (side === 'buy' 
+                    ? (mode === 'perps' ? `Buy / Long ${pair.baseAsset}` : `Buy ${pair.baseAsset}`) 
+                    : (mode === 'perps' ? `Sell / Short ${pair.baseAsset}` : `Sell ${pair.baseAsset}`))}
+            </span>
           </button>
         </div>
       </form>

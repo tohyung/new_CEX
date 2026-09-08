@@ -256,7 +256,7 @@ export const TradeRepublicView: React.FC<TradeRepublicViewProps> = ({
       {/* 1. Static 16:9 Fixed Ratio Background Stage (Stationary behind rolling content) */}
       <div 
         id="static-16-9-backdrop" 
-        className="fixed inset-0 pointer-events-none z-0 overflow-hidden flex items-end justify-center select-none bg-[#070a0f]"
+        className="fixed inset-0 pointer-events-none z-0 overflow-hidden flex items-end justify-center select-none"
       >
         {/* Strictly 16:9 fixed ratio canvas container */}
         <div 
@@ -273,13 +273,13 @@ export const TradeRepublicView: React.FC<TradeRepublicViewProps> = ({
           {/* Luminous Green Light Zone (Anchored lower in between the bottom of the fixed 16:9 canvas) */}
           <div className="absolute inset-x-0 -bottom-8 sm:-bottom-12 flex justify-center items-end pointer-events-none">
             {/* Broad diffuse emerald aurora bloom diffusing upward */}
-            <div className="w-[850px] sm:w-[1250px] h-[330px] sm:h-[430px] bg-gradient-to-t from-emerald-500/22 via-emerald-600/8 to-transparent rounded-t-full blur-[105px] sm:blur-[135px] transform translate-y-16 sm:translate-y-24 animate-green-zone pointer-events-none" />
+            <div className="w-[850px] sm:w-[1250px] h-[330px] sm:h-[430px] bg-gradient-to-t from-emerald-500/25 via-emerald-600/10 to-transparent rounded-t-full blur-[105px] sm:blur-[135px] transform translate-y-16 sm:translate-y-24 animate-green-zone pointer-events-none" />
             {/* Core luminous radiant glow in the center bottom */}
-            <div className="absolute bottom-0 w-[460px] sm:w-[700px] h-[190px] sm:h-[250px] bg-emerald-400/20 rounded-t-full blur-[65px] sm:blur-[85px] pointer-events-none" />
+            <div className="absolute bottom-0 w-[460px] sm:w-[700px] h-[190px] sm:h-[250px] bg-emerald-400/25 rounded-t-full blur-[65px] sm:blur-[85px] pointer-events-none" />
             {/* Focused neon center light point */}
-            <div className="absolute bottom-0 w-[220px] sm:w-[350px] h-[85px] sm:h-[120px] bg-emerald-300/28 rounded-t-full blur-[35px] pointer-events-none" />
+            <div className="absolute bottom-0 w-[220px] sm:w-[350px] h-[85px] sm:h-[120px] bg-emerald-300/35 rounded-t-full blur-[35px] pointer-events-none" />
             {/* Subtle luminous green horizon line at the viewport bottom edge */}
-            <div className="absolute bottom-8 sm:bottom-12 inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent pointer-events-none" />
+            <div className="absolute bottom-8 sm:bottom-12 inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent pointer-events-none" />
           </div>
         </div>
       </div>

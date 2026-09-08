@@ -99,7 +99,7 @@ export interface IndicatorSettings {
   rsi: boolean;
 }
 
-export type AppViewMode = 'pro_terminal' | 'trade_republic';
+export type AppViewMode = 'pro_terminal' | 'trade_republic' | 'trade' | 'market' | 'community' | 'square';
 
 export interface SavingsPlan {
   id: string;

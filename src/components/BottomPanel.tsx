@@ -9,7 +9,9 @@ import {
   ArrowUpRight, 
   ArrowDownRight,
   ShieldCheck,
-  Wallet
+  Wallet,
+  Search,
+  Maximize2
 } from 'lucide-react';
 import { Order, Position, AssetBalance, TradingPair } from '../types';
 import { playSound } from '../utils/sound';
@@ -43,7 +45,7 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
   return (
     <div className="flex flex-col h-full bg-white/[0.035] backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.37),inset_0_1px_0_0_rgba(255,255,255,0.05)] overflow-hidden text-xs select-none font-republic">
       {/* Tabs Header */}
-      <div className="h-9 px-3 border-b border-white/[0.08] flex items-center justify-between bg-white/[0.02] shrink-0">
+      <div className="h-8 px-2.5 border-b border-white/[0.08] flex items-center justify-between bg-white/[0.02] shrink-0">
         <div className="flex items-center space-x-1">
           {/* Positions Tab */}
           <button
@@ -121,20 +123,33 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
           </button>
         </div>
 
-        {/* Tab Right Actions */}
-        {activeTab === 'open_orders' && openOrders.length > 0 && (
-          <button
-            id="cancel-all-orders-btn"
-            onClick={() => {
-              playSound('cancel');
-              onCancelAllOrders();
-            }}
-            className="text-[11px] text-gray-400 hover:text-[#f43f5e] flex items-center space-x-1 px-2 py-0.5 rounded-md bg-[#181d28] border border-[#1e2330] transition-colors"
-          >
-            <Trash2 className="w-3 h-3" />
-            <span>Cancel All ({openOrders.length})</span>
-          </button>
-        )}
+        {/* Tab Right Actions & Terminal Window Controls */}
+        <div className="flex items-center space-x-2">
+          {activeTab === 'open_orders' && openOrders.length > 0 && (
+            <button
+              id="cancel-all-orders-btn"
+              onClick={() => {
+                playSound('cancel');
+                onCancelAllOrders();
+              }}
+              className="text-[11px] text-gray-400 hover:text-[#f43f5e] flex items-center space-x-1 px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.08] transition-colors"
+            >
+              <Trash2 className="w-3 h-3" />
+              <span>Cancel All ({openOrders.length})</span>
+            </button>
+          )}
+          <div className="flex items-center space-x-1 text-gray-500">
+            <button className="p-1 hover:text-gray-300 rounded transition-colors" title="Search">
+              <Search className="w-3.5 h-3.5" />
+            </button>
+            <button className="p-1 hover:text-gray-300 rounded transition-colors" title="Maximize">
+              <Maximize2 className="w-3.5 h-3.5" />
+            </button>
+            <button className="p-1 hover:text-gray-300 rounded transition-colors" title="Close">
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Content Area */}
@@ -151,15 +166,15 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
               <table className="w-full text-left font-republic-mono text-[11px]">
                 <thead className="text-[10px] text-gray-400 bg-[#0c1018] border-b border-white/[0.08] font-republic sticky top-0 z-10">
                   <tr>
-                    <th className="py-2 px-2.5">Contract / Mode</th>
-                    <th className="py-2 px-2.5">Size</th>
-                    <th className="py-2 px-2.5">Entry Price</th>
-                    <th className="py-2 px-2.5">Mark Price</th>
-                    <th className="py-2 px-2.5">Liq. Price</th>
-                    <th className="py-2 px-2.5">Margin</th>
-                    <th className="py-2 px-2.5">Unrealized PnL (ROI%)</th>
-                    <th className="py-2 px-2.5">TP / SL</th>
-                    <th className="py-2 px-2.5 text-right">Close Position</th>
+                    <th className="py-1.5 px-2.5">Contract / Mode</th>
+                    <th className="py-1.5 px-2.5">Size</th>
+                    <th className="py-1.5 px-2.5">Entry Price</th>
+                    <th className="py-1.5 px-2.5">Mark Price</th>
+                    <th className="py-1.5 px-2.5">Liq. Price</th>
+                    <th className="py-1.5 px-2.5">Margin</th>
+                    <th className="py-1.5 px-2.5">Unrealized PnL (ROI%)</th>
+                    <th className="py-1.5 px-2.5">TP / SL</th>
+                    <th className="py-1.5 px-2.5 text-right">Close Position</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/[0.04]">
@@ -169,7 +184,7 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
                     return (
                       <tr key={pos.id} className="hover:bg-white/[0.04] transition-colors">
                         {/* Contract */}
-                        <td className="py-2 px-2.5">
+                        <td className="py-1.5 px-2.5">
                           <div className="flex items-center space-x-1.5">
                             <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
                               isLong ? 'bg-[#10b981]/15 text-[#10b981]' : 'bg-[#f43f5e]/15 text-[#f43f5e]'
@@ -184,32 +199,32 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
                         </td>
 
                         {/* Size */}
-                        <td className="py-2 px-2.5 text-white font-semibold">
+                        <td className="py-1.5 px-2.5 text-white font-semibold">
                           {pos.size} {pos.pair.split('/')[0]}
                         </td>
 
                         {/* Entry Price */}
-                        <td className="py-2 px-2.5 text-gray-300">
+                        <td className="py-1.5 px-2.5 text-gray-300">
                           ${pos.entryPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </td>
 
                         {/* Mark Price */}
-                        <td className="py-2 px-2.5 text-gray-300">
+                        <td className="py-1.5 px-2.5 text-gray-300">
                           ${pos.markPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </td>
 
                         {/* Liq Price */}
-                        <td className="py-2 px-2.5 text-rose-400 font-semibold">
+                        <td className="py-1.5 px-2.5 text-rose-400 font-semibold">
                           ${pos.liqPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </td>
 
                         {/* Margin */}
-                        <td className="py-2 px-2.5 text-gray-300">
+                        <td className="py-1.5 px-2.5 text-gray-300">
                           ${pos.margin.toFixed(2)} USDT
                         </td>
 
                         {/* Unrealized PnL */}
-                        <td className="py-2 px-2.5">
+                        <td className="py-1.5 px-2.5">
                           <div className="flex flex-col">
                             <span className={`font-bold ${isProfit ? 'text-[#10b981]' : 'text-[#f43f5e]'}`}>
                               {isProfit ? '+' : ''}${pos.unrealizedPnl.toFixed(2)} USDT
@@ -221,13 +236,13 @@ export const BottomPanel: React.FC<BottomPanelProps> = ({
                         </td>
 
                         {/* TP / SL */}
-                        <td className="py-2 px-2.5 text-[9px] text-gray-400">
+                        <td className="py-1.5 px-2.5 text-[9px] text-gray-400">
                           <div>TP: {pos.takeProfit ? `$${pos.takeProfit}` : '--'}</div>
                           <div>SL: {pos.stopLoss ? `$${pos.stopLoss}` : '--'}</div>
                         </td>
 
                         {/* Close Action */}
-                        <td className="py-2 px-2.5 text-right">
+                        <td className="py-1.5 px-2.5 text-right">
                           <button
                             id={`close-pos-${pos.id}`}
                             onClick={() => {

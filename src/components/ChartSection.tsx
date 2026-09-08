@@ -103,6 +103,7 @@ export const ChartSection: React.FC<ChartSectionProps> = ({
   const [magnetMode, setMagnetMode] = useState(false);
   const [drawingsLocked, setDrawingsLocked] = useState(false);
   const [drawingsVisible, setDrawingsVisible] = useState(true);
+  const [showCtrlZoomBanner, setShowCtrlZoomBanner] = useState(true);
 
   // Watchlist & Market Pair Selector State (replaces static BTC/USDT icon)
   const [isWatchlistOpen, setIsWatchlistOpen] = useState(false);
@@ -763,12 +764,12 @@ export const ChartSection: React.FC<ChartSectionProps> = ({
         isFullscreen ? 'fixed inset-0 z-[100] rounded-none' : 'h-full'
       }`}
     >
-      {/* 1. TRADINGVIEW TOP HEADER TOOLBAR */}
-      <div className="h-10 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between px-2.5 text-xs text-gray-300">
-        {/* Left: Symbol & Timeframes */}
-        <div className="flex items-center space-x-1">
-          {/* Watchlist & Market Pair Selector (Replaces static BTC/USDT icon) */}
-          <div className="relative mr-1.5" ref={watchlistRef}>
+      {/* 1. TOP TICKER STRIP (Integrated into chart card header) */}
+      <div className="h-11 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between px-3 text-xs shrink-0">
+        {/* Left: Symbol Dropdown, Price, 24h Metrics */}
+        <div className="flex items-center space-x-3.5 sm:space-x-5 overflow-x-auto scrollbar-none py-1">
+          {/* Watchlist & Market Pair Selector */}
+          <div className="relative mr-1" ref={watchlistRef}>
             <button
               id="chart-watchlist-btn"
               onClick={() => {
@@ -778,16 +779,12 @@ export const ChartSection: React.FC<ChartSectionProps> = ({
               className="flex items-center space-x-2 px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] hover:border-white/30 text-white transition-all group shadow-xs cursor-pointer"
               title="Watchlist & Markets"
             >
-              <div className="flex items-center space-x-1.5">
-                <span className="font-republic-display font-extrabold text-white text-xs tracking-tight">
-                  {pair.symbol}
-                </span>
-                <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded font-republic-mono ${
-                  pair.change24h >= 0 ? 'bg-[#10b981]/15 text-[#10b981]' : 'bg-[#f43f5e]/15 text-[#f43f5e]'
-                }`}>
-                  {pair.change24h >= 0 ? '+' : ''}{pair.change24h}%
-                </span>
+              <div className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs border border-amber-500/30">
+                {pair.baseAsset === 'BTC' ? '₿' : pair.baseAsset === 'ETH' ? 'Ξ' : pair.baseAsset.charAt(0)}
               </div>
+              <span className="font-republic-display font-extrabold text-white text-xs tracking-tight">
+                {pair.symbol}
+              </span>
               <ChevronDown className={`w-3.5 h-3.5 text-gray-400 group-hover:text-white transition-transform ${isWatchlistOpen ? 'rotate-180 text-white' : ''}`} />
             </button>
 
@@ -922,8 +919,70 @@ export const ChartSection: React.FC<ChartSectionProps> = ({
             )}
           </div>
 
-          <div className="h-4 w-[1px] bg-white/[0.08] mx-1" />
+          {/* Current Price & USD valuation */}
+          <div className="flex flex-col">
+            <span className="font-republic-mono font-bold text-sm text-[#00e676] leading-none">
+              {(pair.currentPrice ?? 0).toLocaleString(undefined, { minimumFractionDigits: pair.precision })}
+            </span>
+            <span className="font-republic-mono text-[9px] text-gray-400 leading-none mt-0.5">
+              ${(pair.currentPrice ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            </span>
+          </div>
 
+          {/* 24h Change */}
+          <div className="flex flex-col">
+            <span className="text-[9px] text-gray-400 leading-none">24h Change</span>
+            <span className={`font-republic-mono text-[11px] font-semibold flex items-center space-x-0.5 leading-none mt-0.5 ${
+              pair.change24h >= 0 ? 'text-[#00e676]' : 'text-rose-400'
+            }`}>
+              <span>{(Math.abs(pair.currentPrice * (pair.change24h / 100))).toFixed(1)}</span>
+              <span>{pair.change24h >= 0 ? '▲' : '▼'} {Math.abs(pair.change24h).toFixed(2)} %</span>
+            </span>
+          </div>
+
+          {/* 24h High */}
+          <div className="hidden sm:flex flex-col">
+            <span className="text-[9px] text-gray-400 leading-none">24h High</span>
+            <span className="font-republic-mono text-[11px] font-semibold text-gray-200 leading-none mt-0.5">
+              {(pair.high24h ?? pair.currentPrice * 1.014).toLocaleString(undefined, { minimumFractionDigits: pair.precision })}
+            </span>
+          </div>
+
+          {/* 24h Low */}
+          <div className="hidden sm:flex flex-col">
+            <span className="text-[9px] text-gray-400 leading-none">24h Low</span>
+            <span className="font-republic-mono text-[11px] font-semibold text-gray-200 leading-none mt-0.5">
+              {(pair.low24h ?? pair.currentPrice * 0.986).toLocaleString(undefined, { minimumFractionDigits: pair.precision })}
+            </span>
+          </div>
+
+          {/* 24h Volume */}
+          <div className="hidden md:flex flex-col">
+            <span className="text-[9px] text-gray-400 leading-none">24h Volume</span>
+            <span className="font-republic-mono text-[11px] font-semibold text-gray-200 leading-none mt-0.5">
+              {(pair.volume24h ?? 548013).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            </span>
+          </div>
+        </div>
+
+        {/* Right utility buttons: settings, maximize, close */}
+        <div className="flex items-center space-x-1 text-gray-500 shrink-0">
+          <button onClick={() => setIsSettingsModalOpen(true)} className="p-1 hover:text-gray-300 rounded transition-colors" title="Settings">
+            <Settings className="w-3.5 h-3.5" />
+          </button>
+          <button onClick={() => { playSound('click'); setIsFullscreen(!isFullscreen); }} className="p-1 hover:text-gray-300 rounded transition-colors" title="Expand">
+            <Maximize2 className="w-3.5 h-3.5" />
+          </button>
+          <button className="p-1 hover:text-gray-300 rounded transition-colors" title="Close">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+
+      {/* 2. TRADINGVIEW SUB-HEADER TOOLBAR */}
+      <div className="h-9 bg-white/[0.015] border-b border-white/[0.08] flex items-center justify-between px-2.5 text-xs text-gray-300 shrink-0">
+        {/* Left: Timeframe Selector Pills */}
+        <div className="flex items-center space-x-1">
           {/* Timeframe Selector Pills */}
           <div className="flex items-center space-x-0.5">
             {timeframes.map(tf => (
@@ -1460,6 +1519,20 @@ export const ChartSection: React.FC<ChartSectionProps> = ({
                   </svg>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Zoom notification banner */}
+          {showCtrlZoomBanner && (
+            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center space-x-2 bg-[#1e88e5] text-white text-[11px] px-3.5 py-1.5 rounded-md shadow-lg pointer-events-auto">
+              <span>Press and hold Ctrl while zooming to maintain the chart position</span>
+              <button
+                onClick={() => setShowCtrlZoomBanner(false)}
+                className="hover:text-gray-200 text-white font-bold ml-1 cursor-pointer"
+                title="Dismiss"
+              >
+                ✕
+              </button>
             </div>
           )}
         </div>

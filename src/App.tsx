@@ -32,12 +32,15 @@ import { BottomPanel } from './components/BottomPanel';
 import { DepositModal } from './components/DepositModal';
 import { LoginModal } from './components/LoginModal';
 import { TradeRepublicView } from './components/TradeRepublicView';
+import { CommunityView } from './components/CommunityView';
+import { SquareView } from './components/SquareView';
+import { Footer } from './components/Footer';
 import { ToastContainer, ToastMessage } from './components/Toast';
 import { playSound, setSoundEnabled, getSoundEnabled } from './utils/sound';
 
 export default function App() {
   // 1. Trading State
-  const [appViewMode, setAppViewMode] = useState<AppViewMode>('trade_republic');
+  const [appViewMode, setAppViewMode] = useState<AppViewMode>('pro_terminal');
   const [pairs, setPairs] = useState<TradingPair[]>(TRADING_PAIRS);
   const [currentPairSymbol, setCurrentPairSymbol] = useState<string>('BTC/USDT');
   const [tradingMode, setTradingMode] = useState<TradingMode>('spot');
@@ -319,13 +322,15 @@ export default function App() {
     const baseBal = balances.find(b => b.asset === currentPair.baseAsset);
 
     if (tradingMode === 'perps' || orderData.side === 'buy') {
-      if ((usdtBal?.free || 0) < requiredMargin) {
+      const tolerance = 0.10; // 10 cents margin tolerance for decimal precision when calculating max amount
+      if ((usdtBal?.free || 0) + tolerance < requiredMargin) {
         addToast('error', 'Insufficient Funds', `You need at least $${requiredMargin.toFixed(2)} USDT available.`);
         return;
       }
     } else {
       // Spot sell
-      if ((baseBal?.free || 0) < orderData.amount) {
+      const tolerance = 0.00001;
+      if ((baseBal?.free || 0) + tolerance < orderData.amount) {
         addToast('error', 'Insufficient Crypto Balance', `You only have ${baseBal?.free || 0} ${currentPair.baseAsset} free to sell.`);
         return;
       }
@@ -513,9 +518,33 @@ export default function App() {
   const currentUsdtBalance = balances.find(b => b.asset === 'USDT') || { asset: 'USDT', free: 0, locked: 0, total: 0, usdValue: 0 };
   const currentBaseBalance = balances.find(b => b.asset === currentPair.baseAsset) || { asset: currentPair.baseAsset, free: 0, locked: 0, total: 0, usdValue: 0 };
 
+  // Pro terminal scale zoom state (default 85% for a compact, proportional workstation layout)
+  const [terminalScale, setTerminalScale] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('tr_terminal_scale');
+      if (saved) {
+        const parsed = Number(saved);
+        if (!isNaN(parsed) && parsed >= 60 && parsed <= 120) return parsed;
+      }
+    } catch {
+      // fallback
+    }
+    return 85;
+  });
+
+  const handleTerminalScaleChange = (newScale: number) => {
+    const clamped = Math.max(70, Math.min(110, newScale));
+    setTerminalScale(clamped);
+    try {
+      localStorage.setItem('tr_terminal_scale', clamped.toString());
+    } catch {
+      // fallback
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#070a0f] text-[#d1d4dc] flex flex-col font-republic selection:bg-white/20">
-      {/* 1. Header / Navbar */}
+    <div className="min-h-screen bg-[#070a0f] bg-[radial-gradient(ellipse_100%_50%_at_50%_0%,rgba(56,189,248,0.06),transparent_50%),radial-gradient(ellipse_100%_40%_at_50%_100%,rgba(16,185,129,0.04),transparent_40%)] text-[#d1d4dc] flex flex-col font-republic selection:bg-white/20 overflow-x-clip relative">
+      {/* 1. Header / Navbar (Sticky translucent top bar) */}
       <Navbar
         currentPair={currentPair}
         allPairs={pairs}
@@ -535,114 +564,152 @@ export default function App() {
         }}
         totalBalanceUsd={totalBalanceUsd}
         totalPnlUsd={totalPnlUsd}
+        terminalScale={terminalScale}
+        onTerminalScaleChange={handleTerminalScaleChange}
+        onShowToast={(msg, type) => addToast(type || 'info', type === 'success' ? 'Success' : 'Notice', msg)}
       />
 
-      {/* 2. Main View Area: Either Trade Republic Modern UI/UX or Advanced Pro Terminal */}
-      {appViewMode === 'trade_republic' ? (
-        <TradeRepublicView
-          currentPair={currentPair}
-          allPairs={pairs}
-          onSelectPair={handleSelectPair}
-          balances={balances}
-          onExecuteTrade={(orderData) => {
-            handlePlaceOrder({
-              side: orderData.side,
-              type: orderData.type,
-              price: orderData.price,
-              amount: orderData.amount
-            });
-          }}
-          onOpenDeposit={() => setIsDepositOpen(true)}
-          onSwitchToProTerminal={() => setAppViewMode('pro_terminal')}
-        />
-      ) : (
-        <main className="flex-1 p-2.5 flex flex-col gap-2.5 overflow-y-auto lg:overflow-hidden bg-[#07090e]">
-          {/* Top Section: Order Book (Left) | Chart (Center) | Trading Board + Wallet Board (Right) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-2.5 h-auto lg:h-[580px] xl:h-[610px] shrink-0">
-            {/* Left Column: Order Book column board (col-span-12 lg:col-span-3 - exact same length as chart) */}
-            <div className="order-2 lg:order-1 col-span-12 lg:col-span-3 h-[480px] lg:h-full min-h-0">
-              <OrderBook
-                pair={currentPair}
-                asks={orderBook.asks}
-                bids={orderBook.bids}
-                lastPrice={currentPair.currentPrice}
-                priceTickDirection={priceTickDirection}
-                onSelectPrice={(price, amount) => {
-                  setSelectedPrice(price);
-                  if (amount) setSelectedAmount(amount);
-                }}
-              />
-            </div>
+      {/* 2. Main View Area: Trade (Pro Terminal), Market, Community, Square */}
+      <div className="flex-1 flex flex-col min-h-0">
+        {appViewMode === 'market' || appViewMode === 'trade_republic' ? (
+          <TradeRepublicView
+            currentPair={currentPair}
+            allPairs={pairs}
+            onSelectPair={handleSelectPair}
+            balances={balances}
+            onExecuteTrade={(orderData) => {
+              handlePlaceOrder({
+                side: orderData.side,
+                type: orderData.type,
+                price: orderData.price,
+                amount: orderData.amount
+              });
+            }}
+            onOpenDeposit={() => setIsDepositOpen(true)}
+            onSwitchToProTerminal={() => setAppViewMode('pro_terminal')}
+          />
+        ) : appViewMode === 'community' ? (
+          <CommunityView
+            currentPair={currentPair}
+            onSelectPair={handleSelectPair}
+            onSwitchToTrade={() => setAppViewMode('pro_terminal')}
+            user={user}
+            onOpenLogin={() => setIsLoginOpen(true)}
+          />
+        ) : appViewMode === 'square' ? (
+          <SquareView
+            currentPair={currentPair}
+            onSelectPair={handleSelectPair}
+            onSwitchToTrade={() => setAppViewMode('pro_terminal')}
+          />
+        ) : (
+          <main className="flex-1 w-full bg-[#07090e] p-2 sm:p-4 flex items-center justify-center min-h-[calc(100vh-64px)] overflow-x-hidden">
+            <div
+              className="w-full max-w-[1520px] h-[820px] max-h-[90vh] flex flex-col gap-2 min-h-0 transition-all duration-150"
+              style={{
+                zoom: terminalScale / 100,
+              }}
+            >
+              {/* Main 12-Column Grid: Left 9 cols (Order Book + Chart on top, Positions on bottom) | Right 3 cols (Trading Board + Wallet Board ONLY) */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 flex-1 min-h-0">
+                {/* Left 9 columns: Order Book (3 cols) and Chart (6 cols) on top; Positions Board on bottom */}
+                <div className="order-1 lg:order-1 col-span-12 lg:col-span-9 h-full flex flex-col gap-2 min-h-0">
+                  {/* Top: Order Book + Chart */}
+                  <div className="grid grid-cols-1 lg:grid-cols-9 gap-2 flex-1 min-h-0">
+                    {/* Left Column: Order Book column board (col-span-3 of 9) */}
+                    <div className="order-2 lg:order-1 col-span-12 lg:col-span-3 h-full min-h-0">
+                      <OrderBook
+                        pair={currentPair}
+                        asks={orderBook.asks}
+                        bids={orderBook.bids}
+                        lastPrice={currentPair.currentPrice}
+                        priceTickDirection={priceTickDirection}
+                        onSelectPrice={(price, amount) => {
+                          setSelectedPrice(price);
+                          if (amount) setSelectedAmount(amount);
+                        }}
+                      />
+                    </div>
 
-            {/* Middle Column: Chart (col-span-12 lg:col-span-6 - exact same length as order book) */}
-            <div className="order-1 lg:order-2 col-span-12 lg:col-span-6 h-[480px] lg:h-full min-h-0">
-              <ChartSection
-                pair={currentPair}
-                allPairs={pairs}
-                onSelectPair={handleSelectPair}
-                candles={candles}
-                timeframe={timeframe}
-                onTimeframeChange={handleTimeframeChange}
-                orderBookAsks={orderBook.asks}
-                orderBookBids={orderBook.bids}
-              />
-            </div>
+                    {/* Middle Column: Chart (col-span-6 of 9) */}
+                    <div className="order-1 lg:order-2 col-span-12 lg:col-span-6 h-full min-h-0">
+                      <ChartSection
+                        pair={currentPair}
+                        allPairs={pairs}
+                        onSelectPair={handleSelectPair}
+                        candles={candles}
+                        timeframe={timeframe}
+                        onTimeframeChange={handleTimeframeChange}
+                        orderBookAsks={orderBook.asks}
+                        orderBookBids={orderBook.bids}
+                      />
+                    </div>
+                  </div>
 
-            {/* Right Column: Trading Board on top + Wallet Board right below it (col-span-12 lg:col-span-3 - exact same width as order book) */}
-            <div className="order-3 lg:order-3 col-span-12 lg:col-span-3 h-auto lg:h-full min-h-0 flex flex-col gap-2.5">
-              {/* Trading Board (compact, not too long) */}
-              <OrderEntry
-                pair={currentPair}
-                mode={tradingMode}
-                onModeChange={setTradingMode}
-                currentPrice={currentPair.currentPrice}
-                selectedPriceFromBook={selectedPrice}
-                selectedAmountFromBook={selectedAmount}
-                usdtBalance={currentUsdtBalance}
-                baseAssetBalance={currentBaseBalance}
-                onSubmitOrder={handlePlaceOrder}
-                onOpenDeposit={() => setIsDepositOpen(true)}
-              />
+                  {/* Bottom: Positions Board extending full 9 columns */}
+                  <div className="h-[210px] xl:h-[235px] shrink-0 min-h-0 overflow-hidden">
+                    <BottomPanel
+                      orders={orders}
+                      positions={positions}
+                      balances={balances}
+                      pairs={pairs}
+                      onCancelOrder={handleCancelOrder}
+                      onCancelAllOrders={handleCancelAllOrders}
+                      onClosePosition={handleClosePosition}
+                      onOpenDeposit={() => setIsDepositOpen(true)}
+                    />
+                  </div>
+                </div>
 
-              {/* Wallet Board right below the trading board */}
-              <div className="flex-1 min-h-[160px]">
-                <WalletBoard
-                  balances={balances}
-                  pair={currentPair}
-                  positions={positions}
-                  onOpenDeposit={() => setIsDepositOpen(true)}
-                />
+                {/* Right Column: Spot Trading on top, Wallet Board in middle, and Market Trades on bottom */}
+                <div className="order-2 lg:order-2 col-span-12 lg:col-span-3 h-full min-h-0 flex flex-col gap-2">
+                  {/* Top: Trading Board (Spot) */}
+                  <div className="flex-[4.8] min-h-0 overflow-hidden">
+                    <OrderEntry
+                      pair={currentPair}
+                      mode={tradingMode}
+                      onModeChange={setTradingMode}
+                      currentPrice={currentPair.currentPrice}
+                      selectedPriceFromBook={selectedPrice}
+                      selectedAmountFromBook={selectedAmount}
+                      usdtBalance={currentUsdtBalance}
+                      baseAssetBalance={currentBaseBalance}
+                      onSubmitOrder={handlePlaceOrder}
+                      onOpenDeposit={() => setIsDepositOpen(true)}
+                    />
+                  </div>
+
+                  {/* Middle: Wallet Board */}
+                  <div className="flex-[2.4] min-h-0 overflow-hidden">
+                    <WalletBoard
+                      balances={balances}
+                      pair={currentPair}
+                      positions={positions}
+                      onOpenDeposit={() => setIsDepositOpen(true)}
+                    />
+                  </div>
+
+                  {/* Bottom: Trades (Market Trades) */}
+                  <div className="flex-[3.2] min-h-0 overflow-hidden">
+                    <MarketTrades
+                      pair={currentPair}
+                      trades={trades}
+                      onSelectPrice={(price) => setSelectedPrice(price)}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          </main>
+        )}
+      </div>
 
-          {/* Bottom Section: Positions Board extending from order book to the chart (col-span-12 lg:col-span-9) & Market Trades Board (col-span-12 lg:col-span-3) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-2.5 h-[255px] xl:h-[265px] shrink-0">
-            {/* Positions Board (extending from Order Book through Chart: col-span-12 lg:col-span-9) */}
-            <div className="col-span-12 lg:col-span-9 h-full min-h-0 overflow-hidden">
-              <BottomPanel
-                orders={orders}
-                positions={positions}
-                balances={balances}
-                pairs={pairs}
-                onCancelOrder={handleCancelOrder}
-                onCancelAllOrders={handleCancelAllOrders}
-                onClosePosition={handleClosePosition}
-                onOpenDeposit={() => setIsDepositOpen(true)}
-              />
-            </div>
-
-            {/* Market Trades Board (aligned under Trading Board + Wallet Board: col-span-12 lg:col-span-3) */}
-            <div className="col-span-12 lg:col-span-3 h-full min-h-0 overflow-hidden">
-              <MarketTrades
-                pair={currentPair}
-                trades={trades}
-                onSelectPrice={(price) => setSelectedPrice(price)}
-              />
-            </div>
-          </div>
-        </main>
-      )}
+      {/* 3. Global 4-Column Translucent Footer (at the end of the site) */}
+      <Footer
+        onOpenDeposit={() => setIsDepositOpen(true)}
+        onOpenLogin={() => setIsLoginOpen(true)}
+        onShowToast={(msg, type) => addToast(msg, type || 'info')}
+      />
 
       {/* Deposit & Testnet Faucet Modal */}
       <DepositModal
