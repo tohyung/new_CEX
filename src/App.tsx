@@ -23,18 +23,18 @@ import {
   AppViewMode
 } from './types';
 import { Navbar } from './components/Navbar';
-import { ChartSection } from './components/ChartSection';
-import { OrderBook } from './components/OrderBook';
-import { OrderEntry } from './components/OrderEntry';
-import { WalletBoard } from './components/WalletBoard';
-import { MarketTrades } from './components/MarketTrades';
-import { BottomPanel } from './components/BottomPanel';
 import { DepositModal } from './components/DepositModal';
 import { LoginModal } from './components/LoginModal';
 import { MarketView } from './components/MarketView';
 import { TradeRepublicView } from './components/TradeRepublicView';
 import { CommunityView } from './components/CommunityView';
 import { SquareView } from './components/SquareView';
+import { OrderBook } from './components/OrderBook';
+import { ChartSection } from './components/ChartSection';
+import { OrderEntry } from './components/OrderEntry';
+import { WalletBoard } from './components/WalletBoard';
+import { MarketTrades } from './components/MarketTrades';
+import { BottomPanel } from './components/BottomPanel';
 import { Footer } from './components/Footer';
 import { ToastContainer, ToastMessage } from './components/Toast';
 import { playSound, setSoundEnabled, getSoundEnabled } from './utils/sound';
@@ -47,6 +47,31 @@ export default function App() {
   const [tradingMode, setTradingMode] = useState<TradingMode>('spot');
   const [timeframe, setTimeframe] = useState<string>('15m');
   const [soundActive, setSoundActive] = useState<boolean>(true);
+
+  // Theme state: dark vs light mode with localStorage persistence
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    const saved = localStorage.getItem('tr_theme');
+    return (saved === 'light' || saved === 'dark') ? saved : 'dark';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('tr_theme', theme);
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+      root.classList.remove('light');
+    } else {
+      root.classList.add('light');
+      root.classList.remove('dark');
+    }
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
+  // Sub-tab for Pro Terminal left column (Order Book vs Recent Market Trades)
+  const [terminalLeftTab, setTerminalLeftTab] = useState<'orderbook' | 'trades'>('orderbook');
 
   // Active pair
   const currentPair = pairs.find(p => p.symbol === currentPairSymbol) || pairs[0];
@@ -520,7 +545,7 @@ export default function App() {
   const currentBaseBalance = balances.find(b => b.asset === currentPair.baseAsset) || { asset: currentPair.baseAsset, free: 0, locked: 0, total: 0, usdValue: 0 };
 
   return (
-    <div className="min-h-screen bg-[#070a0f] bg-[radial-gradient(ellipse_100%_50%_at_50%_0%,rgba(56,189,248,0.06),transparent_50%),radial-gradient(ellipse_100%_40%_at_50%_100%,rgba(16,185,129,0.04),transparent_40%)] text-[#d1d4dc] flex flex-col font-republic selection:bg-white/20 overflow-x-clip relative">
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-[#070a0f] text-[#d1d4dc] bg-[radial-gradient(ellipse_100%_50%_at_50%_0%,rgba(56,189,248,0.06),transparent_50%),radial-gradient(ellipse_100%_40%_at_50%_100%,rgba(16,185,129,0.04),transparent_40%)]' : 'bg-[#f4f5f8] text-[#111827]'} flex flex-col font-republic selection:bg-white/20 overflow-x-clip relative transition-colors duration-200`}>
       {/* 1. Header / Navbar (Sticky translucent top bar) */}
       <Navbar
         currentPair={currentPair}
@@ -532,12 +557,14 @@ export default function App() {
         onSelectAppViewMode={setAppViewMode}
         soundEnabled={soundActive}
         onToggleSound={handleToggleSound}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
         onOpenDeposit={() => setIsDepositOpen(true)}
         onOpenLogin={() => setIsLoginOpen(true)}
         user={user}
         onLogout={() => {
           setUser(null);
-          addToast('Logged out successfully', 'info');
+          addToast('info', 'Logged Out', 'Logged out successfully');
         }}
         totalBalanceUsd={totalBalanceUsd}
         totalPnlUsd={totalPnlUsd}
@@ -586,21 +613,17 @@ export default function App() {
             onSwitchToTrade={() => setAppViewMode('pro_terminal')}
           />
         ) : (
-          <main className="flex-1 w-full bg-[#07090e] p-2 sm:p-4 flex items-center justify-center min-h-[calc(100vh-64px)] overflow-x-hidden">
-            <div
-              className="w-full max-w-[1520px] h-[820px] max-h-[90vh] flex flex-col gap-2 min-h-0 transition-all duration-150"
-              style={{
-                zoom: 0.95,
-              }}
-            >
-              {/* Main 12-Column Grid: Left 10 cols (Order Book 2 cols + Chart 8 cols on top, Positions on bottom) | Right 2 cols (Trading Board) */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 flex-1 min-h-0">
-                {/* Left 10 columns: Order Book (2 of 10) and Chart (8 of 10) on top; Positions Board on bottom */}
-                <div className="order-1 lg:order-1 col-span-12 lg:col-span-10 h-full flex flex-col gap-2 min-h-0">
-                  {/* Top: Order Book + Chart */}
-                  <div className="grid grid-cols-1 lg:grid-cols-10 gap-2 flex-1 min-h-0">
-                    {/* Left Column: Order Book column board (col-span-2 of 10 = 2/12 of total screen width) */}
-                    <div className="order-2 lg:order-1 col-span-12 lg:col-span-2 h-full min-h-0">
+          /* Restored Multi-Board Pro Trading Terminal with Minimalist Sharper Theme */
+          <div className="flex-1 flex flex-col p-2 sm:p-2.5 gap-2 min-h-0">
+            {/* Main Section: Left+Center Block (Top: Order Book + Chart with equal height; Bottom: Stretched Positions Board) & Right Column (Order Entry + Lengthened Assets) */}
+            <div className="flex flex-col lg:flex-row gap-2 min-h-[720px] lg:h-[calc(100vh-75px)]">
+              {/* Left + Center Area: Top row contains Order Book & Chart (equal height); Bottom row contains Positions Board stretched to the left */}
+              <div className="flex-1 min-w-0 flex flex-col h-full gap-2 min-h-[500px]">
+                {/* Top Row: Order Book & Chart side-by-side with equal height */}
+                <div className="flex-1 min-h-[380px] flex flex-col lg:flex-row gap-2">
+                  {/* Order Book & Market Trades - Shortened to equal the chart height */}
+                  <div className="w-full lg:w-[260px] xl:w-[275px] shrink-0 flex flex-col h-full">
+                    {terminalLeftTab === 'orderbook' ? (
                       <OrderBook
                         pair={currentPair}
                         asks={orderBook.asks}
@@ -611,79 +634,83 @@ export default function App() {
                           setSelectedPrice(price);
                           if (amount) setSelectedAmount(amount);
                         }}
+                        activeTab={terminalLeftTab}
+                        onTabChange={setTerminalLeftTab}
                       />
-                    </div>
-
-                    {/* Middle Column: Chart (col-span-8 of 10 = 8/12 of total screen width) */}
-                    <div className="order-1 lg:order-2 col-span-12 lg:col-span-8 h-full min-h-0">
-                      <ChartSection
+                    ) : (
+                      <MarketTrades
                         pair={currentPair}
-                        allPairs={pairs}
-                        onSelectPair={handleSelectPair}
-                        candles={candles}
-                        timeframe={timeframe}
-                        onTimeframeChange={handleTimeframeChange}
-                        orderBookAsks={orderBook.asks}
-                        orderBookBids={orderBook.bids}
+                        trades={trades}
+                        onSelectPrice={(price) => setSelectedPrice(price)}
+                        activeTab={terminalLeftTab}
+                        onTabChange={setTerminalLeftTab}
                       />
-                    </div>
+                    )}
                   </div>
 
-                  {/* Bottom: Positions Board extending full 10 columns */}
-                  <div className="h-[210px] xl:h-[235px] shrink-0 min-h-0 overflow-hidden">
-                    <BottomPanel
-                      orders={orders}
-                      positions={positions}
-                      balances={balances}
-                      pairs={pairs}
-                      onCancelOrder={handleCancelOrder}
-                      onCancelAllOrders={handleCancelAllOrders}
-                      onClosePosition={handleClosePosition}
-                      onOpenDeposit={() => setIsDepositOpen(true)}
+                  {/* Chart Section - Takes remaining horizontal space, exact same height as Order Book */}
+                  <div className="flex-1 min-w-0 flex flex-col h-full">
+                    <ChartSection
+                      pair={currentPair}
+                      allPairs={pairs}
+                      onSelectPair={handleSelectPair}
+                      candles={candles}
+                      timeframe={timeframe}
+                      onTimeframeChange={handleTimeframeChange}
+                      orderBookAsks={orderBook.asks}
+                      orderBookBids={orderBook.bids}
                     />
                   </div>
                 </div>
 
-                {/* Right Column: 2/12 of total screen width (EXACT SAME WIDTH as Order Book: 2/12) */}
-                <div className="order-2 lg:order-2 col-span-12 lg:col-span-2 h-full min-h-0 flex flex-col gap-2">
-                  {/* Top: Trading Board (Spot) */}
-                  <div className="flex-[4.8] min-h-0 overflow-hidden">
-                    <OrderEntry
-                      pair={currentPair}
-                      mode={tradingMode}
-                      onModeChange={setTradingMode}
-                      currentPrice={currentPair.currentPrice}
-                      selectedPriceFromBook={selectedPrice}
-                      selectedAmountFromBook={selectedAmount}
-                      usdtBalance={currentUsdtBalance}
-                      baseAssetBalance={currentBaseBalance}
-                      onSubmitOrder={handlePlaceOrder}
-                      onOpenDeposit={() => setIsDepositOpen(true)}
-                    />
-                  </div>
+                {/* Stretched Positions Board - Extends all the way to the left to fill the blank underneath the Order Book and Chart */}
+                <div className="h-[235px] shrink-0">
+                  <BottomPanel
+                    orders={orders}
+                    positions={positions}
+                    balances={balances}
+                    pairs={pairs}
+                    onCancelOrder={handleCancelOrder}
+                    onCancelAllOrders={() => {
+                      setOrders([]);
+                      addToast('info', 'Orders Canceled', 'All open limit orders canceled.');
+                    }}
+                    onClosePosition={handleClosePosition}
+                    onOpenDeposit={() => setIsDepositOpen(true)}
+                  />
+                </div>
+              </div>
 
-                  {/* Middle: Wallet Board */}
-                  <div className="flex-[2.4] min-h-0 overflow-hidden">
-                    <WalletBoard
-                      balances={balances}
-                      pair={currentPair}
-                      positions={positions}
-                      onOpenDeposit={() => setIsDepositOpen(true)}
-                    />
-                  </div>
+              {/* Right Column: Order Entry & Real-time Wallet Board - Thinner, exact same width as left column */}
+              <div className="w-full lg:w-[260px] xl:w-[275px] shrink-0 flex flex-col gap-2 h-full min-h-[620px]">
+                {/* Trading Board (no scrolling needed for info) */}
+                <div className="h-[420px] shrink-0">
+                  <OrderEntry
+                    pair={currentPair}
+                    mode={tradingMode}
+                    onModeChange={setTradingMode}
+                    currentPrice={currentPair.currentPrice}
+                    selectedPriceFromBook={selectedPrice}
+                    selectedAmountFromBook={selectedAmount}
+                    usdtBalance={currentUsdtBalance}
+                    baseAssetBalance={currentBaseBalance}
+                    onSubmitOrder={handlePlaceOrder}
+                    onOpenDeposit={() => setIsDepositOpen(true)}
+                  />
+                </div>
 
-                  {/* Bottom: Trades (Market Trades) */}
-                  <div className="flex-[3.2] min-h-0 overflow-hidden">
-                    <MarketTrades
-                      pair={currentPair}
-                      trades={trades}
-                      onSelectPrice={(price) => setSelectedPrice(price)}
-                    />
-                  </div>
+                {/* Lengthened Asset Board - Fills all blank space in the right column down to the bottom */}
+                <div className="flex-1 min-h-[250px]">
+                  <WalletBoard
+                    balances={balances}
+                    pair={currentPair}
+                    positions={positions}
+                    onOpenDeposit={() => setIsDepositOpen(true)}
+                  />
                 </div>
               </div>
             </div>
-          </main>
+          </div>
         )}
       </div>
 

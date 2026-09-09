@@ -173,14 +173,11 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
   const leverageSteps = [1, 2, 5, 10, 20, 50, 75, 100].filter(l => l <= pair.maxLeverage);
 
   return (
-    <div className="h-full flex flex-col bg-white/[0.035] backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.37),inset_0_1px_0_0_rgba(255,255,255,0.05)] overflow-hidden text-xs select-none font-republic">
+    <div className="h-full flex flex-col bg-[#12141a]/70 backdrop-blur-md border border-white/[0.08] rounded-lg shadow-xs overflow-hidden text-xs select-none font-republic">
       {/* Terminal Title Bar */}
-      <div className="flex items-center justify-between px-3 py-2 bg-white/[0.02] border-b border-white/[0.08] select-none">
-        <div className="flex items-center space-x-2">
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">
-            Order Entry
-          </span>
-          <div className="flex items-center bg-white/[0.04] p-0.5 rounded-lg border border-white/[0.08]">
+      <div className="flex items-center justify-between px-2.5 py-1.5 bg-[#151720]/65 border-b border-white/[0.08] select-none shrink-0">
+        <div className="flex items-center space-x-1.5">
+          <div className="flex items-center bg-white/[0.04] p-0.5 rounded border border-white/[0.08]">
             <button
               id="order-mode-spot-btn"
               type="button"
@@ -188,7 +185,7 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
                 playSound('click');
                 onModeChange?.('spot');
               }}
-              className={`px-2.5 py-0.5 rounded-md text-[11px] font-republic-display font-bold transition-all ${
+              className={`px-2 py-0.5 rounded text-[10px] font-republic-display font-bold transition-all ${
                 mode === 'spot'
                   ? 'bg-white text-black shadow-xs'
                   : 'text-gray-400 hover:text-white'
@@ -203,7 +200,7 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
                 playSound('click');
                 onModeChange?.('perps');
               }}
-              className={`px-2.5 py-0.5 rounded-md text-[11px] font-republic-display font-bold transition-all flex items-center space-x-1 ${
+              className={`px-2 py-0.5 rounded text-[10px] font-republic-display font-bold transition-all flex items-center space-x-1 ${
                 mode === 'perps'
                   ? 'bg-white text-black shadow-xs'
                   : 'text-gray-400 hover:text-white'
@@ -214,7 +211,7 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center space-x-1 text-gray-500">
+        <div className="flex items-center space-x-1 text-gray-400">
           {mode === 'perps' && (
             <button
               type="button"
@@ -222,20 +219,14 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
                 playSound('click');
                 setShowLeverageModal(true);
               }}
-              className="flex items-center space-x-1 text-[10px] font-republic-mono text-gray-300 bg-white/[0.04] hover:bg-white/[0.08] px-1.5 py-0.5 rounded border border-white/[0.08] transition-colors mr-1"
+              className="flex items-center space-x-1 text-[10px] font-republic-mono text-gray-300 bg-white/[0.04] hover:bg-white/[0.08] px-1.5 py-0.5 rounded border border-white/[0.08] transition-colors"
             >
               <span className="capitalize text-gray-400">{marginType}</span>
-              <span className="text-emerald-400 font-bold">{leverage}x</span>
+              <span className="text-[#22c55e] font-bold">{leverage}x</span>
             </button>
           )}
-          <button onClick={() => setShowLeverageModal(true)} className="p-1 hover:text-gray-300 rounded transition-colors" title="Settings">
+          <button onClick={() => setShowLeverageModal(true)} className="p-1 hover:text-white rounded hover:bg-white/[0.04] transition-colors" title="Settings">
             <Settings className="w-3.5 h-3.5" />
-          </button>
-          <button className="p-1 hover:text-gray-300 rounded transition-colors" title="Maximize">
-            <Maximize2 className="w-3.5 h-3.5" />
-          </button>
-          <button className="p-1 hover:text-gray-300 rounded transition-colors" title="Close">
-            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
@@ -348,7 +339,7 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
       )}
 
       {/* Buy / Sell Tabs */}
-      <div className="grid grid-cols-2 p-1.5 bg-white/[0.02] border-b border-white/[0.08] gap-1.5">
+      <div className="grid grid-cols-2 p-1 bg-[#151720]/65 border-b border-white/[0.08] gap-1 shrink-0">
         <button
           id="order-side-buy-btn"
           type="button"
@@ -357,10 +348,10 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
             setSide('buy');
             setValidationHint(null);
           }}
-          className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
+          className={`py-1 text-xs font-bold rounded-md transition-all ${
             side === 'buy'
-              ? 'bg-[#10b981] text-black font-extrabold shadow-sm'
-              : 'text-gray-400 hover:text-white bg-[#161c28]'
+              ? 'bg-[#22c55e] text-black font-extrabold shadow-xs'
+              : 'text-gray-400 hover:text-white bg-black/30'
           }`}
         >
           {mode === 'perps' ? 'Long' : 'Buy'}
@@ -374,10 +365,10 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
             setSide('sell');
             setValidationHint(null);
           }}
-          className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
+          className={`py-1 text-xs font-bold rounded-md transition-all ${
             side === 'sell'
-              ? 'bg-[#f43f5e] text-white font-extrabold shadow-sm'
-              : 'text-gray-400 hover:text-white bg-[#161c28]'
+              ? 'bg-[#ef4444] text-white font-extrabold shadow-xs'
+              : 'text-gray-400 hover:text-white bg-black/30'
           }`}
         >
           {mode === 'perps' ? 'Short' : 'Sell'}
@@ -385,7 +376,7 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
       </div>
 
       {/* Order Type Tabs */}
-      <div className="flex items-center space-x-3 px-3 pt-2.5 text-[11px]">
+      <div className="flex items-center space-x-3 px-3 pt-1.5 text-[11px] shrink-0 border-b border-white/[0.04]">
         {(['limit', 'market', 'stop_limit'] as OrderType[]).map(t => (
           <button
             key={t}
@@ -406,10 +397,10 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
       </div>
 
       {/* Form Content */}
-      <form onSubmit={handleSubmit} className="flex-1 min-h-0 flex flex-col justify-between overflow-y-auto custom-scrollbar p-2.5 space-y-2">
-        <div className="space-y-2">
+      <form onSubmit={handleSubmit} className="flex-1 min-h-0 flex flex-col justify-between overflow-y-auto no-scrollbar p-2.5 space-y-1.5">
+        <div className="space-y-1.5">
           {/* Available balance indicator */}
-          <div className="flex items-center justify-between text-[11px] text-gray-400">
+          <div className="flex items-center justify-between text-[10px] text-gray-400">
             <span>Available:</span>
             <div className="flex items-center space-x-1 font-republic-mono">
               <span className="text-gray-200 font-semibold">
@@ -420,7 +411,7 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
               <button
                 type="button"
                 onClick={onOpenDeposit}
-                className="text-white hover:text-gray-300 font-bold ml-1 text-xs bg-white/10 w-4 h-4 rounded-full flex items-center justify-center"
+                className="text-white hover:text-gray-300 font-bold ml-1 text-[10px] bg-white/10 w-3.5 h-3.5 rounded-full flex items-center justify-center cursor-pointer"
                 title="Deposit / Add Demo Funds"
               >
                 +
@@ -431,8 +422,8 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
           {/* Stop Price Input (Only for Stop-Limit) */}
           {orderType === 'stop_limit' && (
             <div>
-              <div className="text-[10px] text-gray-400 mb-1 font-medium">Stop Price</div>
-              <div className="flex items-center bg-[#161c28] border border-[#1e2330] rounded-lg px-2.5 py-1.5 focus-within:border-white transition-colors">
+              <div className="text-[10px] text-gray-400 mb-0.5 font-medium">Stop Price</div>
+              <div className="flex items-center bg-black/30 border border-white/[0.08] rounded-md px-2 py-1 focus-within:border-white transition-colors">
                 <input
                   id="order-stop-price-input"
                   type="number"
@@ -450,14 +441,14 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
 
           {/* Price Input (Limit or Stop-Limit) */}
           <div>
-            <div className="flex items-center justify-between text-[10px] text-gray-400 mb-1 font-medium">
+            <div className="flex items-center justify-between text-[10px] text-gray-400 mb-0.5 font-medium">
               <span>Price</span>
               {orderType !== 'market' && (
                 <div className="flex items-center space-x-1 text-[9px]">
                   <button
                     type="button"
                     onClick={() => setPriceInput(currentPrice.toFixed(pair.precision))}
-                    className="text-white hover:underline font-republic-mono"
+                    className="text-white hover:underline font-republic-mono cursor-pointer"
                   >
                     Last
                   </button>
@@ -465,8 +456,8 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
               )}
             </div>
 
-            <div className={`flex items-center bg-[#161c28] border border-[#1e2330] rounded-lg px-2.5 py-1.5 transition-colors ${
-              orderType === 'market' ? 'opacity-50 bg-[#0e121a]' : 'focus-within:border-white'
+            <div className={`flex items-center bg-black/30 border border-white/[0.08] rounded-md px-2 py-1 transition-colors ${
+              orderType === 'market' ? 'opacity-50 bg-black/10' : 'focus-within:border-white'
             }`}>
               <input
                 id="order-price-input"
@@ -487,14 +478,14 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
 
           {/* Amount Input */}
           <div>
-            <div className="flex items-center justify-between text-[10px] text-gray-400 mb-1 font-medium">
+            <div className="flex items-center justify-between text-[10px] text-gray-400 mb-0.5 font-medium">
               <span>Amount</span>
-              <span className="text-[10px] text-gray-400 font-republic-mono">
+              <span className="text-[9px] text-gray-400 font-republic-mono">
                 Max: {(side === 'buy' || mode === 'perps' ? maxBuyBase : maxSellBase).toFixed(pair.qtyPrecision)} {pair.baseAsset}
               </span>
             </div>
 
-            <div className="flex items-center bg-[#161c28] border border-[#1e2330] rounded-lg px-2.5 py-1.5 focus-within:border-white transition-colors">
+            <div className="flex items-center bg-black/30 border border-white/[0.08] rounded-md px-2 py-1 focus-within:border-white transition-colors">
               <input
                 ref={amountInputRef}
                 id="order-amount-input"
@@ -516,16 +507,16 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
           </div>
 
           {/* Percentage quick chips */}
-          <div className="grid grid-cols-4 gap-1.5 pt-1">
+          <div className="grid grid-cols-4 gap-1">
             {[25, 50, 75, 100].map(pct => (
               <button
                 key={pct}
                 type="button"
                 onClick={() => handlePercentage(pct)}
-                className={`py-1 rounded-md text-[10px] font-republic-mono font-semibold transition-all ${
+                className={`py-0.5 rounded-md text-[10px] font-republic-mono font-semibold transition-all cursor-pointer ${
                   sliderPercent === pct
                     ? 'bg-white text-black font-extrabold shadow-xs'
-                    : 'bg-[#181d28] text-gray-400 hover:text-white hover:bg-[#202838] border border-[#1e2330]'
+                    : 'bg-[#181a24] text-gray-400 hover:text-white hover:bg-[#1f2230] border border-white/[0.06]'
                 }`}
               >
                 {pct}%
@@ -534,39 +525,39 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
           </div>
 
           {/* TP / SL Toggle and inputs */}
-          <div className="pt-1">
-            <label className="flex items-center space-x-1.5 text-[11px] text-gray-300 cursor-pointer">
+          <div>
+            <label className="flex items-center space-x-1.5 text-[10px] text-gray-300 cursor-pointer">
               <input
                 type="checkbox"
                 checked={enableTpSl}
                 onChange={(e) => setEnableTpSl(e.target.checked)}
-                className="accent-white rounded"
+                className="accent-white rounded-xs cursor-pointer"
               />
               <span>Take Profit / Stop Loss</span>
             </label>
 
             {enableTpSl && (
-              <div className="grid grid-cols-2 gap-2 mt-2">
+              <div className="grid grid-cols-2 gap-1.5 mt-1">
                 <div>
-                  <span className="text-[9px] text-[#10b981] block mb-0.5 font-republic-mono">TP (USDT)</span>
+                  <span className="text-[9px] text-[#22c55e] block mb-0.5 font-republic-mono">TP (USDT)</span>
                   <input
                     type="number"
                     step="any"
                     value={takeProfitInput}
                     onChange={(e) => setTakeProfitInput(e.target.value)}
                     placeholder="Take Profit"
-                    className="w-full bg-[#161c28] border border-[#1e2330] rounded-lg px-2.5 py-1.5 text-[11px] text-white font-republic-mono focus:outline-none focus:border-[#10b981]"
+                    className="w-full bg-[#161822] border border-white/[0.08] rounded-md px-2 py-0.5 text-[11px] text-white font-republic-mono focus:outline-none focus:border-[#22c55e]"
                   />
                 </div>
                 <div>
-                  <span className="text-[9px] text-[#f43f5e] block mb-0.5 font-republic-mono">SL (USDT)</span>
+                  <span className="text-[9px] text-[#ef4444] block mb-0.5 font-republic-mono">SL (USDT)</span>
                   <input
                     type="number"
                     step="any"
                     value={stopLossInput}
                     onChange={(e) => setStopLossInput(e.target.value)}
                     placeholder="Stop Loss"
-                    className="w-full bg-[#161c28] border border-[#1e2330] rounded-lg px-2.5 py-1.5 text-[11px] text-white font-republic-mono focus:outline-none focus:border-[#f43f5e]"
+                    className="w-full bg-[#161822] border border-white/[0.08] rounded-md px-2 py-0.5 text-[11px] text-white font-republic-mono focus:outline-none focus:border-[#ef4444]"
                   />
                 </div>
               </div>
@@ -575,8 +566,8 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
         </div>
 
         {/* Order Summary & Execution Button */}
-        <div className="space-y-2 pt-2 border-t border-white/[0.08]">
-          <div className="space-y-1 text-[10px] text-gray-400">
+        <div className="space-y-1.5 pt-1.5 border-t border-white/[0.08] shrink-0">
+          <div className="space-y-0.5 text-[10px] text-gray-400">
             <div className="flex justify-between">
               <span>Order Value:</span>
               <span className="font-republic-mono text-gray-200">
@@ -593,7 +584,7 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
                   </span>
                 </div>
                 {estLiqPrice && (
-                  <div className="flex justify-between text-rose-400">
+                  <div className="flex justify-between text-[#ef4444]">
                     <span>Est. Liq Price:</span>
                     <span className="font-republic-mono font-semibold">
                       ${estLiqPrice.toFixed(pair.precision)}
@@ -613,7 +604,7 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
 
           {/* Validation Feedback Hint if user clicks without amount or exceeds balance */}
           {validationHint && (
-            <div className="text-[10px] text-amber-300 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1.5 rounded-lg flex items-center justify-between animate-fadeIn">
+            <div className="text-[10px] text-amber-300 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md flex items-center justify-between">
               <span>{validationHint}</span>
               {side === 'buy' && maxBuyBase > 0 && (
                 <button
@@ -631,14 +622,10 @@ export const OrderEntry: React.FC<OrderEntryProps> = ({
           <button
             id="order-submit-btn"
             type="submit"
-            className={`w-full py-2.5 rounded-xl font-extrabold text-xs transition-all shadow-md active:scale-98 flex items-center justify-center space-x-1.5 cursor-pointer ${
+            className={`w-full py-2 rounded-md font-extrabold text-xs transition-all active:scale-[0.99] flex items-center justify-center space-x-1.5 cursor-pointer ${
               side === 'buy'
-                ? parsedAmount <= 0
-                  ? 'bg-[#10b981]/90 hover:bg-[#10b981] text-black shadow-[#10b981]/20'
-                  : 'bg-[#10b981] hover:bg-[#0ea371] text-black shadow-[#10b981]/25'
-                : parsedAmount <= 0
-                  ? 'bg-[#f43f5e]/90 hover:bg-[#f43f5e] text-white shadow-[#f43f5e]/20'
-                  : 'bg-[#f43f5e] hover:bg-[#e11d48] text-white shadow-[#f43f5e]/25'
+                ? 'bg-[#22c55e] hover:bg-[#16a34a] text-black shadow-xs'
+                : 'bg-[#ef4444] hover:bg-[#dc2626] text-white shadow-xs'
             }`}
           >
             <span>

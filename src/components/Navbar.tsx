@@ -21,7 +21,9 @@ import {
   VolumeX,
   ShieldCheck,
   Award,
-  Sparkles
+  Sparkles,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { TradingPair, TradingMode, AppViewMode } from '../types';
 import { playSound } from '../utils/sound';
@@ -36,6 +38,8 @@ interface NavbarProps {
   onSelectAppViewMode: (mode: AppViewMode) => void;
   soundEnabled?: boolean;
   onToggleSound?: () => void;
+  theme?: 'dark' | 'light';
+  onToggleTheme?: () => void;
   onOpenDeposit: () => void;
   onOpenLogin?: () => void;
   user?: { name: string; email: string } | null;
@@ -55,6 +59,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onSelectAppViewMode,
   soundEnabled,
   onToggleSound,
+  theme = 'dark',
+  onToggleTheme,
   onOpenDeposit,
   onOpenLogin,
   user,
@@ -360,6 +366,29 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </button>
                 )}
 
+                {onToggleTheme && (
+                  <button
+                    id="more-theme-btn"
+                    onClick={() => {
+                      playSound('click');
+                      onToggleTheme();
+                    }}
+                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-gray-200 hover:text-white hover:bg-white/[0.06] transition-colors text-left cursor-pointer"
+                  >
+                    <div className="flex items-center space-x-2.5">
+                      {theme === 'dark' ? (
+                        <Moon className="w-4 h-4 text-blue-400 shrink-0" />
+                      ) : (
+                        <Sun className="w-4 h-4 text-amber-400 shrink-0" />
+                      )}
+                      <span className="font-bold text-xs">Theme Preference</span>
+                    </div>
+                    <span className="text-[10px] font-republic-mono text-gray-400 uppercase">
+                      {theme}
+                    </span>
+                  </button>
+                )}
+
                 <button
                   id="more-announcements-btn"
                   onClick={() => {
@@ -396,8 +425,29 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </nav>
 
-      {/* Right side: Deposit, Log in */}
-      <div className="relative z-10 flex items-center space-x-2.5 sm:space-x-3">
+      {/* Right side: Theme Toggle, Deposit, Log in */}
+      <div className="relative z-10 flex items-center space-x-2 sm:space-x-3">
+        {/* User Preference Theme Toggle (Dark / Light Mode) */}
+        {onToggleTheme && (
+          <button
+            id="nav-theme-toggle-btn"
+            type="button"
+            onClick={() => {
+              playSound('click');
+              onToggleTheme();
+            }}
+            className="flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-xl bg-white/[0.05] hover:bg-white/[0.10] border border-white/[0.10] text-gray-300 hover:text-white transition-all cursor-pointer shadow-xs"
+            title={theme === 'dark' ? 'Switch to Light mode' : 'Switch to Dark mode'}
+            aria-label="Toggle dark/light theme"
+          >
+            {theme === 'dark' ? (
+              <Sun className="w-4 h-4 text-amber-400" />
+            ) : (
+              <Moon className="w-4 h-4 text-blue-400" />
+            )}
+          </button>
+        )}
+
         {/* Deposit Button (Wide & Prominent) */}
         <button
           id="nav-deposit-btn"

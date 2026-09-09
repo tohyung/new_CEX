@@ -338,6 +338,27 @@ export const TRADING_PAIRS: TradingPair[] = [
     nextFundingTime: Date.now() + 3 * 3600 * 1000 + 24 * 60 * 1000,
   },
   {
+    symbol: 'AAPL/USDT',
+    baseAsset: 'AAPL',
+    name: 'Apple Inc.',
+    quoteAsset: 'USDT',
+    currentPrice: 266.85,
+    change24h: 0.85,
+    high24h: 268.40,
+    low24h: 264.20,
+    volume24h: 4250000.0,
+    quoteVolume24h: 1134112500,
+    precision: 2,
+    qtyPrecision: 2,
+    minQty: 0.1,
+    maxLeverage: 20,
+    category: 'Stocks',
+    marketCap: 3890000000000,
+    assetType: 'stock',
+    fundingRate: 0.00005,
+    nextFundingTime: Date.now() + 3 * 3600 * 1000 + 24 * 60 * 1000,
+  },
+  {
     symbol: 'NVDA/USDT',
     baseAsset: 'NVDA',
     name: 'NVIDIA Corporation',
@@ -594,7 +615,7 @@ export function generateCandles(basePrice: number, count: number = 80, timeframe
 }
 
 // Generate realistic Order Book bids and asks
-export function generateOrderBook(midPrice: number, precision: number = 2, count: number = 24) {
+export function generateOrderBook(midPrice: number, precision: number = 2, count: number = 50) {
   const step = midPrice > 10000 ? 0.5 : midPrice > 100 ? 0.1 : midPrice > 1 ? 0.01 : 0.0001;
   const asks: OrderBookLevel[] = [];
   const bids: OrderBookLevel[] = [];

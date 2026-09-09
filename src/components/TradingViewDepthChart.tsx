@@ -29,9 +29,8 @@ export const TradingViewDepthChart: React.FC<TradingViewDepthChartProps> = ({
     const width = rect.width;
     const height = rect.height;
 
-    // TradingView Dark background
-    ctx.fillStyle = '#0b0e14';
-    ctx.fillRect(0, 0, width, height);
+    // TradingView Translucent background
+    ctx.clearRect(0, 0, width, height);
 
     if (orderBookBids.length === 0 || orderBookAsks.length === 0) return;
 

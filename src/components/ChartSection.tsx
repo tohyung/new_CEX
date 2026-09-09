@@ -314,7 +314,7 @@ export const ChartSection: React.FC<ChartSectionProps> = ({
       width: container.clientWidth,
       height: container.clientHeight,
       layout: {
-        background: { type: ColorType.Solid, color: '#0b0e14' },
+        background: { type: ColorType.Solid, color: 'transparent' },
         textColor: '#787b86',
         fontFamily: '"DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         fontSize: 11,
@@ -760,12 +760,12 @@ export const ChartSection: React.FC<ChartSectionProps> = ({
 
   return (
     <div
-      className={`flex flex-col bg-white/[0.035] backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.37),inset_0_1px_0_0_rgba(255,255,255,0.05)] overflow-hidden relative font-republic select-none ${
+      className={`flex flex-col bg-[#12141a]/70 backdrop-blur-md border border-white/[0.08] rounded-lg shadow-xs overflow-hidden relative font-republic select-none ${
         isFullscreen ? 'fixed inset-0 z-[100] rounded-none' : 'h-full'
       }`}
     >
       {/* 1. TOP TICKER STRIP (Integrated into chart card header) */}
-      <div className="h-11 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between px-3 text-xs shrink-0">
+      <div className="h-10 bg-[#151720]/65 border-b border-white/[0.08] flex items-center justify-between px-3 text-xs shrink-0">
         {/* Left: Symbol Dropdown, Price, 24h Metrics */}
         <div className="flex items-center space-x-3.5 sm:space-x-5 overflow-x-auto scrollbar-none py-1">
           {/* Watchlist & Market Pair Selector */}
@@ -980,7 +980,7 @@ export const ChartSection: React.FC<ChartSectionProps> = ({
       </div>
 
       {/* 2. TRADINGVIEW SUB-HEADER TOOLBAR */}
-      <div className="h-9 bg-white/[0.015] border-b border-white/[0.08] flex items-center justify-between px-2.5 text-xs text-gray-300 shrink-0">
+      <div className="h-9 bg-black/20 border-b border-white/[0.08] flex items-center justify-between px-2.5 text-xs text-gray-300 shrink-0">
         {/* Left: Timeframe Selector Pills */}
         <div className="flex items-center space-x-1">
           {/* Timeframe Selector Pills */}
@@ -1259,7 +1259,7 @@ export const ChartSection: React.FC<ChartSectionProps> = ({
         )}
 
         {/* Center Container: Chart Canvas or Depth View */}
-        <div className="flex-1 relative flex flex-col overflow-hidden bg-[#0b0e14]">
+        <div className="flex-1 relative flex flex-col overflow-hidden bg-transparent">
           {/* TradingView Status Line HUD (Top-Left of chart canvas) */}
           {chartStyle !== 'depth' && statusCandle && (
             <div className="absolute top-2.5 left-3 z-20 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] font-mono pointer-events-none select-none">
