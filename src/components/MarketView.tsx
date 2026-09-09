@@ -1043,7 +1043,7 @@ export const MarketView: React.FC<MarketViewProps> = ({
                 <div className="w-8 h-8 rounded-full bg-[#22c55e]/20 text-[#22c55e] flex items-center justify-center">
                   <Headphones className="w-4 h-4" />
                 </div>
-                <h3 className="font-bold text-sm text-white">Trade Republic Support</h3>
+                <h3 className="font-bold text-sm text-white">PTIT Exchange Support</h3>
               </div>
               <button
                 onClick={() => setIsSupportOpen(false)}
@@ -1054,7 +1054,7 @@ export const MarketView: React.FC<MarketViewProps> = ({
             </div>
             
             <p className="text-xs text-gray-300 leading-relaxed">
-              Welcome to Trade Republic Instant Help. Institutional order books, zero-slippage matching, and 24/7 dedicated support are active.
+              Welcome to PTIT Exchange Instant Help. Institutional order books, zero-slippage matching, and 24/7 dedicated support are active.
             </p>
 
             <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3 text-xs space-y-1.5">

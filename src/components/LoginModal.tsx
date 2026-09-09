@@ -79,7 +79,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             <Lock className="w-5 h-5 text-emerald-400" />
           </div>
           <h3 className="text-xl sm:text-2xl font-republic-display font-black text-white tracking-tight">
-            Log in to Trade Republic
+            Log in to PTIT Exchange
           </h3>
           <p className="text-xs text-gray-400 mt-1">
             Access your crypto portfolio, €0 fee savings plans, and 3.75% cash interest.

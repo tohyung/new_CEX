@@ -120,7 +120,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Left side: Brand Logo, Mode Tabs & Ticker metrics */}
       <div className="relative z-10 flex items-center space-x-3 sm:space-x-5">
-        {/* Brand Logo & Heading - Wide & Elegant (Trade Republic Landing Page) */}
+        {/* Brand Logo & Heading - Wide & Elegant (PTIT Exchange Landing Page) */}
         <button
           id="nav-brand-logo-btn"
           type="button"
@@ -133,17 +133,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               ? 'ring-1 ring-white/20 bg-white/[0.05]'
               : 'hover:opacity-90'
           }`}
-          title="Trade Republic Landing Page"
+          title="PTIT Exchange Landing Page"
         >
           <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-white flex items-center justify-center shadow-[0_2px_10px_rgba(255,255,255,0.15)] text-black shrink-0 transition-transform duration-200 group-hover:scale-105">
             <span className="font-republic-display text-xs md:text-sm font-black tracking-tighter">TR</span>
           </div>
           <div className="flex flex-col">
             <span className="font-republic-display font-extrabold text-xs md:text-sm tracking-tight text-white uppercase hidden sm:inline group-hover:text-emerald-400 transition-colors">
-              TRADE REPUBLIC
+              PTIT Exchange
             </span>
             <span className="text-[9px] font-republic-mono text-gray-400 tracking-wider uppercase hidden md:inline leading-none">
-              BANK • CRYPTO
+              CRYPTO EXCHANGE
             </span>
           </div>
         </button>

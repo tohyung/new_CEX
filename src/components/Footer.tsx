@@ -93,11 +93,11 @@ export const Footer: React.FC<FooterProps> = ({
   };
 
   const socialLinks = [
-    { name: 'X (Twitter)', handle: '@TradeRepublic', icon: Twitter, url: 'https://twitter.com', members: '185K followers' },
-    { name: 'Discord', handle: 'Trade Republic Club', icon: MessageCircle, url: 'https://discord.com', members: '48K members' },
+    { name: 'X (Twitter)', handle: '@PTITExchange', icon: Twitter, url: 'https://twitter.com', members: '185K followers' },
+    { name: 'Discord', handle: 'PTIT Exchange Club', icon: MessageCircle, url: 'https://discord.com', members: '48K members' },
     { name: 'Telegram', handle: 'TR Official Crypto', icon: Send, url: 'https://telegram.org', members: '32K subscribers' },
-    { name: 'YouTube', handle: 'Trade Republic Academy', icon: Youtube, url: 'https://youtube.com', members: '210K subscribers' },
-    { name: 'LinkedIn', handle: 'Trade Republic Bank', icon: Linkedin, url: 'https://linkedin.com', members: '120K followers' },
+    { name: 'YouTube', handle: 'PTIT Exchange Academy', icon: Youtube, url: 'https://youtube.com', members: '210K subscribers' },
+    { name: 'LinkedIn', handle: 'PTIT Exchange Bank', icon: Linkedin, url: 'https://linkedin.com', members: '120K followers' },
     { name: 'GitHub', handle: 'TradeRepublic-OSS', icon: Github, url: 'https://github.com', members: 'Open Source APIs' },
   ];
 
@@ -115,8 +115,8 @@ export const Footer: React.FC<FooterProps> = ({
     : tokenList.filter(t => t.category.toLowerCase().includes(tokenFilter.toLowerCase()));
 
   const helpFaqs = [
-    { q: 'How do crypto settlements work on Trade Republic?', a: 'All crypto transactions are executed directly with institutional European liquidity partners. Custody is securely managed in cold storage adhering to BaFin and MiCA standards.' },
-    { q: 'What is the €1 flat external settlement fee?', a: 'Unlike traditional platforms charging 1.5% to 3% variable commissions, Trade Republic charges €0 trading commission and a flat €1 per order to cover third-party clearing, custody, and settlement.' },
+    { q: 'How do crypto settlements work on PTIT Exchange?', a: 'All crypto transactions are executed directly with institutional European liquidity partners. Custody is securely managed in cold storage adhering to BaFin and MiCA standards.' },
+    { q: 'What is the €1 flat external settlement fee?', a: 'Unlike traditional platforms charging 1.5% to 3% variable commissions, PTIT Exchange charges €0 trading commission and a flat €1 per order to cover third-party clearing, custody, and settlement.' },
     { q: 'Are deposits protected under the statutory guarantee?', a: 'Cash deposits are held in escrow partner accounts (such as Deutsche Bank and J.P. Morgan) and are legally protected up to €100,000 per investor by the German Deposit Guarantee Scheme (EdB).' },
     { q: 'Can I automate crypto investments with a Sparplan?', a: 'Yes! You can set up zero-fee recurring savings plans (Sparplan) for Bitcoin, Ethereum, Solana, and more on a weekly, bi-weekly, or monthly schedule with as little as €1.' },
   ].filter(f => f.q.toLowerCase().includes(helpSearch.toLowerCase()) || f.a.toLowerCase().includes(helpSearch.toLowerCase()));
@@ -144,10 +144,10 @@ export const Footer: React.FC<FooterProps> = ({
                 </div>
                 <div className="flex flex-col">
                   <span className="font-republic-display font-extrabold text-xs tracking-tight text-white uppercase">
-                    TRADE REPUBLIC
+                    PTIT Exchange
                   </span>
                   <span className="text-[9px] font-republic-mono text-gray-400 tracking-wider uppercase">
-                    BANK • CRYPTO
+                    CRYPTO EXCHANGE
                   </span>
                 </div>
               </div>
@@ -159,7 +159,7 @@ export const Footer: React.FC<FooterProps> = ({
 
               {/* Copyright */}
               <div className="text-[10px] text-gray-400 pt-0.5 font-republic">
-                © 2026 Trade Republic Bank GmbH
+                © 2026 PTIT Exchange GmbH
               </div>
             </div>
 
@@ -292,7 +292,7 @@ export const Footer: React.FC<FooterProps> = ({
                     <button
                       key={social.name}
                       type="button"
-                      onClick={() => notify(`Opening Trade Republic community on ${social.name}`)}
+                      onClick={() => notify(`Opening PTIT Exchange community on ${social.name}`)}
                       title={`${social.name} (${social.members})`}
                       className="group flex flex-col items-center justify-center py-2 px-1 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/20 transition-all cursor-pointer"
                     >
@@ -324,7 +324,7 @@ export const Footer: React.FC<FooterProps> = ({
                   TR
                 </div>
                 <div>
-                  <h3 className="font-bold text-base">About Trade Republic</h3>
+                  <h3 className="font-bold text-base">About PTIT Exchange</h3>
                   <p className="text-[11px] text-gray-400">Europe’s Largest Digital Asset Bank</p>
                 </div>
               </div>
@@ -335,7 +335,7 @@ export const Footer: React.FC<FooterProps> = ({
 
             <div className="text-xs text-gray-300 space-y-3.5 leading-relaxed">
               <p>
-                Founded in 2015, <strong className="text-white">Trade Republic Bank GmbH</strong> is a full-service European credit institution licensed by the European Central Bank (ECB) and supervised by BaFin and the Deutsche Bundesbank.
+                Founded in 2015, <strong className="text-white">PTIT Exchange GmbH</strong> is a full-service European credit institution licensed by the European Central Bank (ECB) and supervised by BaFin and the Deutsche Bundesbank.
               </p>
               <div className="grid grid-cols-2 gap-3 p-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-center">
                 <div>
@@ -377,7 +377,7 @@ export const Footer: React.FC<FooterProps> = ({
 
             <div className="text-xs text-gray-300 space-y-3 leading-relaxed">
               <p>
-                Trade Republic Bank GmbH complies strictly with the European General Data Protection Regulation (EU GDPR) and the German Federal Data Protection Act (BDSG).
+                PTIT Exchange GmbH complies strictly with the European General Data Protection Regulation (EU GDPR) and the German Federal Data Protection Act (BDSG).
               </p>
               <div className="p-3 bg-white/[0.03] border border-white/[0.08] rounded-xl space-y-2">
                 <div className="font-semibold text-white">Our Privacy Commitments:</div>
@@ -417,7 +417,7 @@ export const Footer: React.FC<FooterProps> = ({
 
             <div className="text-xs text-gray-300 space-y-3 leading-relaxed">
               <p>
-                By accessing Trade Republic’s Spot and Perpetual trading interfaces, you agree to the customer agreement and relevant European MiCA digital asset directives.
+                By accessing PTIT Exchange’s Spot and Perpetual trading interfaces, you agree to the customer agreement and relevant European MiCA digital asset directives.
               </p>
               <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl space-y-1 text-amber-200">
                 <div className="font-bold text-xs">Risk Notice:</div>
@@ -594,7 +594,7 @@ export const Footer: React.FC<FooterProps> = ({
                   <Check className="w-6 h-6" />
                 </div>
                 <div className="font-bold text-sm text-white">Feedback Received!</div>
-                <p className="text-xs text-gray-400">Thank you for helping us improve Trade Republic.</p>
+                <p className="text-xs text-gray-400">Thank you for helping us improve PTIT Exchange.</p>
               </div>
             ) : (
               <form onSubmit={handleFeedbackSubmit} className="space-y-3.5 text-xs">
@@ -668,7 +668,7 @@ export const Footer: React.FC<FooterProps> = ({
             <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
               <div className="flex items-center space-x-2">
                 <DollarSign className="w-5 h-5 text-emerald-400" />
-                <h3 className="font-bold text-base">Trade Republic Pricing & Fee Schedule</h3>
+                <h3 className="font-bold text-base">PTIT Exchange Pricing & Fee Schedule</h3>
               </div>
               <button onClick={handleCloseModal} className="p-1 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white">
                 <X className="w-5 h-5" />
@@ -778,7 +778,7 @@ export const Footer: React.FC<FooterProps> = ({
             <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
               <div className="flex items-center space-x-2">
                 <Rocket className="w-5 h-5 text-purple-400" />
-                <h3 className="font-bold text-base">Trade Republic Product Roadmap</h3>
+                <h3 className="font-bold text-base">PTIT Exchange Product Roadmap</h3>
               </div>
               <button onClick={handleCloseModal} className="p-1 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white">
                 <X className="w-5 h-5" />

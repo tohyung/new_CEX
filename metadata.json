@@ -1,6 +1,6 @@
 {
-  "name": "Trade Republic — Crypto & Pro Terminal",
-  "description": "Professional Centralized Cryptocurrency Exchange trading terminal featuring Trade Republic's new minimalist UI/UX, 3.75% cash interest yield, automated savings plans, real-time order books, and institutional perps trading.",
+  "name": "PTIT Exchange — Crypto \u0026 Pro Terminal",
+  "description": "Professional Centralized Cryptocurrency Exchange trading terminal featuring PTIT Exchange's new minimalist UI/UX, 3.75% cash interest yield, automated savings plans, real-time order books, and institutional perps trading.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

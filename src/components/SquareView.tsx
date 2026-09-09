@@ -46,7 +46,7 @@ interface SquareArticle {
 const SQUARE_ARTICLES: SquareArticle[] = [
   {
     id: 'sq-1',
-    author: 'Trade Republic Research',
+    author: 'PTIT Exchange Research',
     handle: '@TR_Research',
     verified: true,
     avatar: 'TR',

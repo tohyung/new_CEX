@@ -48,7 +48,7 @@ export const TradeRepublicView: React.FC<TradeRepublicViewProps> = ({
   onOpenDeposit,
   onSwitchToProTerminal
 }) => {
-  // Currency selection: Euro (€) is Trade Republic's native currency, or USD ($)
+  // Currency selection: Euro (€) is PTIT Exchange's native currency, or USD ($)
   const [currency, setCurrency] = useState<'EUR' | 'USD'>('EUR');
   const fxRate = currency === 'EUR' ? 0.92 : 1.0;
   const currencySymbol = currency === 'EUR' ? '€' : '$';
@@ -57,7 +57,7 @@ export const TradeRepublicView: React.FC<TradeRepublicViewProps> = ({
   const [activeSection, setActiveSection] = useState<'watchlist' | 'yield' | 'savings_plans'>('watchlist');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Timeframe selector (Trade Republic style: 1D, 1W, 1M, 6M, 1Y, MAX)
+  // Timeframe selector (PTIT Exchange style: 1D, 1W, 1M, 6M, 1Y, MAX)
   const [selectedTf, setSelectedTf] = useState<RepublicTimeframe>('1D');
 
   // Trade Modal / Sheet State
@@ -69,7 +69,7 @@ export const TradeRepublicView: React.FC<TradeRepublicViewProps> = ({
   const [savingsFrequency, setSavingsFrequency] = useState<'weekly' | 'biweekly' | 'monthly'>('weekly');
   const [savingsPlanSuccess, setSavingsPlanSuccess] = useState(false);
 
-  // Active Savings Plans (Trade Republic Sparpläne)
+  // Active Savings Plans (PTIT Exchange Sparpläne)
   const [savingsPlans, setSavingsPlans] = useState<SavingsPlan[]>([
     {
       id: 'sp-1',
@@ -93,7 +93,7 @@ export const TradeRepublicView: React.FC<TradeRepublicViewProps> = ({
     }
   ]);
 
-  // Real-time Cash Interest Yield (Trade Republic 3.75% p.a. on uninvested cash)
+  // Real-time Cash Interest Yield (PTIT Exchange 3.75% p.a. on uninvested cash)
   const usdtBal = balances.find(b => b.asset === 'USDT')?.free || 10000;
   const cashInSelectedCurrency = usdtBal * fxRate;
   const annualInterestRate = 0.0375; // 3.75% p.a.
@@ -109,7 +109,7 @@ export const TradeRepublicView: React.FC<TradeRepublicViewProps> = ({
     return () => clearInterval(timer);
   }, [cashInSelectedCurrency]);
 
-  // Chart data simulation for smooth Trade Republic line curve
+  // Chart data simulation for smooth PTIT Exchange line curve
   const chartPoints = useMemo(() => {
     const pointsCount = selectedTf === '1D' ? 40 : selectedTf === '1W' ? 50 : selectedTf === '1M' ? 60 : 70;
     const basePrice = currentPair.currentPrice * fxRate;
@@ -202,7 +202,7 @@ export const TradeRepublicView: React.FC<TradeRepublicViewProps> = ({
   // Quick preset amount buttons
   const amountPresets = [25, 50, 100, 250, 500];
 
-  // Execute Trade Republic Order
+  // Execute PTIT Exchange Order
   const handleConfirmOrder = () => {
     const numAmount = parseFloat(tradeAmountCurrency);
     if (isNaN(numAmount) || numAmount <= 0) return;
@@ -355,7 +355,7 @@ export const TradeRepublicView: React.FC<TradeRepublicViewProps> = ({
             </div>
           </div>
 
-          {/* Fluid Bezier Chart Canvas (Trade Republic Clean Line) */}
+          {/* Fluid Bezier Chart Canvas (PTIT Exchange Clean Line) */}
           <div 
             ref={chartContainerRef}
             onMouseMove={handleChartMouseMove}
@@ -711,7 +711,7 @@ export const TradeRepublicView: React.FC<TradeRepublicViewProps> = ({
         </section>
       </main>
 
-      {/* 3. Trade Republic Modal / Sheet for Buy, Sell, and Savings Plans */}
+      {/* 3. PTIT Exchange Modal / Sheet for Buy, Sell, and Savings Plans */}
       {isTradeModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 font-republic">
           <div className="bg-[#12161f]/90 backdrop-blur-2xl border border-white/[0.12] rounded-3xl max-w-md w-full p-6 relative shadow-[0_25px_60px_rgba(0,0,0,0.7)] animate-in fade-in zoom-in-95 duration-150">
@@ -734,7 +734,7 @@ export const TradeRepublicView: React.FC<TradeRepublicViewProps> = ({
                     ? `Create ${currentPair.baseAsset} Sparplan` 
                     : `${tradeAction.toUpperCase()} ${currentPair.baseAsset}`}
                 </h3>
-                <p className="text-xs text-gray-400 mt-1">Trade Republic Instant Execution</p>
+                <p className="text-xs text-gray-400 mt-1">PTIT Exchange Instant Execution</p>
               </div>
             </div>
 
