@@ -31,6 +31,7 @@ import { MarketTrades } from './components/MarketTrades';
 import { BottomPanel } from './components/BottomPanel';
 import { DepositModal } from './components/DepositModal';
 import { LoginModal } from './components/LoginModal';
+import { MarketView } from './components/MarketView';
 import { TradeRepublicView } from './components/TradeRepublicView';
 import { CommunityView } from './components/CommunityView';
 import { SquareView } from './components/SquareView';
@@ -40,7 +41,7 @@ import { playSound, setSoundEnabled, getSoundEnabled } from './utils/sound';
 
 export default function App() {
   // 1. Trading State
-  const [appViewMode, setAppViewMode] = useState<AppViewMode>('pro_terminal');
+  const [appViewMode, setAppViewMode] = useState<AppViewMode>('trade_republic');
   const [pairs, setPairs] = useState<TradingPair[]>(TRADING_PAIRS);
   const [currentPairSymbol, setCurrentPairSymbol] = useState<string>('BTC/USDT');
   const [tradingMode, setTradingMode] = useState<TradingMode>('spot');
@@ -518,30 +519,6 @@ export default function App() {
   const currentUsdtBalance = balances.find(b => b.asset === 'USDT') || { asset: 'USDT', free: 0, locked: 0, total: 0, usdValue: 0 };
   const currentBaseBalance = balances.find(b => b.asset === currentPair.baseAsset) || { asset: currentPair.baseAsset, free: 0, locked: 0, total: 0, usdValue: 0 };
 
-  // Pro terminal scale zoom state (default 85% for a compact, proportional workstation layout)
-  const [terminalScale, setTerminalScale] = useState<number>(() => {
-    try {
-      const saved = localStorage.getItem('tr_terminal_scale');
-      if (saved) {
-        const parsed = Number(saved);
-        if (!isNaN(parsed) && parsed >= 60 && parsed <= 120) return parsed;
-      }
-    } catch {
-      // fallback
-    }
-    return 85;
-  });
-
-  const handleTerminalScaleChange = (newScale: number) => {
-    const clamped = Math.max(70, Math.min(110, newScale));
-    setTerminalScale(clamped);
-    try {
-      localStorage.setItem('tr_terminal_scale', clamped.toString());
-    } catch {
-      // fallback
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#070a0f] bg-[radial-gradient(ellipse_100%_50%_at_50%_0%,rgba(56,189,248,0.06),transparent_50%),radial-gradient(ellipse_100%_40%_at_50%_100%,rgba(16,185,129,0.04),transparent_40%)] text-[#d1d4dc] flex flex-col font-republic selection:bg-white/20 overflow-x-clip relative">
       {/* 1. Header / Navbar (Sticky translucent top bar) */}
@@ -564,14 +541,20 @@ export default function App() {
         }}
         totalBalanceUsd={totalBalanceUsd}
         totalPnlUsd={totalPnlUsd}
-        terminalScale={terminalScale}
-        onTerminalScaleChange={handleTerminalScaleChange}
         onShowToast={(msg, type) => addToast(type || 'info', type === 'success' ? 'Success' : 'Notice', msg)}
       />
 
       {/* 2. Main View Area: Trade (Pro Terminal), Market, Community, Square */}
       <div className="flex-1 flex flex-col min-h-0">
-        {appViewMode === 'market' || appViewMode === 'trade_republic' ? (
+        {appViewMode === 'market' ? (
+          <MarketView
+            allPairs={pairs}
+            currentPair={currentPair}
+            onSelectPair={handleSelectPair}
+            onSwitchToTrade={() => setAppViewMode('pro_terminal')}
+            onOpenDeposit={() => setIsDepositOpen(true)}
+          />
+        ) : appViewMode === 'trade_republic' ? (
           <TradeRepublicView
             currentPair={currentPair}
             allPairs={pairs}
@@ -607,17 +590,17 @@ export default function App() {
             <div
               className="w-full max-w-[1520px] h-[820px] max-h-[90vh] flex flex-col gap-2 min-h-0 transition-all duration-150"
               style={{
-                zoom: terminalScale / 100,
+                zoom: 0.95,
               }}
             >
-              {/* Main 12-Column Grid: Left 9 cols (Order Book + Chart on top, Positions on bottom) | Right 3 cols (Trading Board + Wallet Board ONLY) */}
+              {/* Main 12-Column Grid: Left 10 cols (Order Book 2 cols + Chart 8 cols on top, Positions on bottom) | Right 2 cols (Trading Board) */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 flex-1 min-h-0">
-                {/* Left 9 columns: Order Book (3 cols) and Chart (6 cols) on top; Positions Board on bottom */}
-                <div className="order-1 lg:order-1 col-span-12 lg:col-span-9 h-full flex flex-col gap-2 min-h-0">
+                {/* Left 10 columns: Order Book (2 of 10) and Chart (8 of 10) on top; Positions Board on bottom */}
+                <div className="order-1 lg:order-1 col-span-12 lg:col-span-10 h-full flex flex-col gap-2 min-h-0">
                   {/* Top: Order Book + Chart */}
-                  <div className="grid grid-cols-1 lg:grid-cols-9 gap-2 flex-1 min-h-0">
-                    {/* Left Column: Order Book column board (col-span-3 of 9) */}
-                    <div className="order-2 lg:order-1 col-span-12 lg:col-span-3 h-full min-h-0">
+                  <div className="grid grid-cols-1 lg:grid-cols-10 gap-2 flex-1 min-h-0">
+                    {/* Left Column: Order Book column board (col-span-2 of 10 = 2/12 of total screen width) */}
+                    <div className="order-2 lg:order-1 col-span-12 lg:col-span-2 h-full min-h-0">
                       <OrderBook
                         pair={currentPair}
                         asks={orderBook.asks}
@@ -631,8 +614,8 @@ export default function App() {
                       />
                     </div>
 
-                    {/* Middle Column: Chart (col-span-6 of 9) */}
-                    <div className="order-1 lg:order-2 col-span-12 lg:col-span-6 h-full min-h-0">
+                    {/* Middle Column: Chart (col-span-8 of 10 = 8/12 of total screen width) */}
+                    <div className="order-1 lg:order-2 col-span-12 lg:col-span-8 h-full min-h-0">
                       <ChartSection
                         pair={currentPair}
                         allPairs={pairs}
@@ -646,7 +629,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Bottom: Positions Board extending full 9 columns */}
+                  {/* Bottom: Positions Board extending full 10 columns */}
                   <div className="h-[210px] xl:h-[235px] shrink-0 min-h-0 overflow-hidden">
                     <BottomPanel
                       orders={orders}
@@ -661,8 +644,8 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Right Column: Spot Trading on top, Wallet Board in middle, and Market Trades on bottom */}
-                <div className="order-2 lg:order-2 col-span-12 lg:col-span-3 h-full min-h-0 flex flex-col gap-2">
+                {/* Right Column: 2/12 of total screen width (EXACT SAME WIDTH as Order Book: 2/12) */}
+                <div className="order-2 lg:order-2 col-span-12 lg:col-span-2 h-full min-h-0 flex flex-col gap-2">
                   {/* Top: Trading Board (Spot) */}
                   <div className="flex-[4.8] min-h-0 overflow-hidden">
                     <OrderEntry

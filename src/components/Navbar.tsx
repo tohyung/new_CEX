@@ -14,8 +14,6 @@ import {
   RefreshCw,
   LogIn,
   User,
-  Minus,
-  Plus,
   FileText,
   HelpCircle,
   Bell,
@@ -44,8 +42,6 @@ interface NavbarProps {
   onLogout?: () => void;
   totalBalanceUsd?: number;
   totalPnlUsd?: number;
-  terminalScale?: number;
-  onTerminalScaleChange?: (scale: number) => void;
   onShowToast?: (msg: string, type?: 'success' | 'info') => void;
 }
 
@@ -65,8 +61,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onLogout,
   totalBalanceUsd = 0,
   totalPnlUsd = 0,
-  terminalScale = 85,
-  onTerminalScaleChange,
   onShowToast
 }) => {
   const [isPairDropdownOpen, setIsPairDropdownOpen] = useState(false);
@@ -120,23 +114,37 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Left side: Brand Logo, Mode Tabs & Ticker metrics */}
       <div className="relative z-10 flex items-center space-x-3 sm:space-x-5">
-        {/* Brand Logo & Heading - Wide & Elegant */}
-        <div className="flex items-center space-x-2.5 mr-1">
-          <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-white flex items-center justify-center shadow-[0_2px_10px_rgba(255,255,255,0.15)] text-black shrink-0">
+        {/* Brand Logo & Heading - Wide & Elegant (Trade Republic Landing Page) */}
+        <button
+          id="nav-brand-logo-btn"
+          type="button"
+          onClick={() => {
+            playSound('click');
+            onSelectAppViewMode('trade_republic');
+          }}
+          className={`flex items-center space-x-2.5 mr-1 cursor-pointer group text-left focus:outline-hidden p-1 rounded-xl transition-all ${
+            appViewMode === 'trade_republic'
+              ? 'ring-1 ring-white/20 bg-white/[0.05]'
+              : 'hover:opacity-90'
+          }`}
+          title="Trade Republic Landing Page"
+        >
+          <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-white flex items-center justify-center shadow-[0_2px_10px_rgba(255,255,255,0.15)] text-black shrink-0 transition-transform duration-200 group-hover:scale-105">
             <span className="font-republic-display text-xs md:text-sm font-black tracking-tighter">TR</span>
           </div>
           <div className="flex flex-col">
-            <span className="font-republic-display font-extrabold text-xs md:text-sm tracking-tight text-white uppercase hidden sm:inline">
+            <span className="font-republic-display font-extrabold text-xs md:text-sm tracking-tight text-white uppercase hidden sm:inline group-hover:text-emerald-400 transition-colors">
               TRADE REPUBLIC
             </span>
             <span className="text-[9px] font-republic-mono text-gray-400 tracking-wider uppercase hidden md:inline leading-none">
               BANK • CRYPTO
             </span>
           </div>
-        </div>
+        </button>
+      </div>
 
-        {/* Navigation Series of Text Buttons: Trade (Pro Terminal), Market, Community, Square, More */}
-        <nav className="flex items-center space-x-1 sm:space-x-1.5 md:space-x-2 lg:space-x-3 ml-1 sm:ml-4">
+      {/* Center: Navigation Series of Text Buttons (Trade, Market, Community, Square, More) */}
+      <nav className="absolute left-1/2 -translate-x-1/2 z-20 flex items-center space-x-3 sm:space-x-5 md:space-x-6 lg:space-x-8">
           {/* Trade Button (Pro Terminal) */}
           <button
             id="nav-btn-trade"
@@ -145,13 +153,22 @@ export const Navbar: React.FC<NavbarProps> = ({
               playSound('click');
               onSelectAppViewMode('pro_terminal');
             }}
-            className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-republic-display transition-all cursor-pointer ${
+            className={`group relative py-1.5 px-2.5 text-sm md:text-[15px] font-republic-display transition-colors cursor-pointer ${
               appViewMode === 'pro_terminal' || appViewMode === 'trade'
-                ? 'text-white font-extrabold bg-white/[0.08] shadow-xs'
-                : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
+                ? 'text-white font-extrabold'
+                : 'text-gray-400 hover:text-white font-medium'
             }`}
           >
-            Trade
+            <span className="relative inline-block">
+              <span>Trade</span>
+              <span
+                className={`absolute -bottom-1 left-0 right-0 h-[2px] bg-white transition-transform duration-250 origin-center rounded-full ${
+                  appViewMode === 'pro_terminal' || appViewMode === 'trade'
+                    ? 'scale-x-100'
+                    : 'scale-x-0 group-hover:scale-x-100'
+                }`}
+              />
+            </span>
           </button>
 
           {/* Market Button */}
@@ -162,13 +179,22 @@ export const Navbar: React.FC<NavbarProps> = ({
               playSound('click');
               onSelectAppViewMode('market');
             }}
-            className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-republic-display transition-all cursor-pointer ${
-              appViewMode === 'market' || appViewMode === 'trade_republic'
-                ? 'text-white font-extrabold bg-white/[0.08] shadow-xs'
-                : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
+            className={`group relative py-1.5 px-2.5 text-sm md:text-[15px] font-republic-display transition-colors cursor-pointer ${
+              appViewMode === 'market'
+                ? 'text-white font-extrabold'
+                : 'text-gray-400 hover:text-white font-medium'
             }`}
           >
-            Market
+            <span className="relative inline-block">
+              <span>Market</span>
+              <span
+                className={`absolute -bottom-1 left-0 right-0 h-[2px] bg-white transition-transform duration-250 origin-center rounded-full ${
+                  appViewMode === 'market'
+                    ? 'scale-x-100'
+                    : 'scale-x-0 group-hover:scale-x-100'
+                }`}
+              />
+            </span>
           </button>
 
           {/* Community Button */}
@@ -179,13 +205,22 @@ export const Navbar: React.FC<NavbarProps> = ({
               playSound('click');
               onSelectAppViewMode('community');
             }}
-            className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-republic-display transition-all cursor-pointer ${
+            className={`group relative py-1.5 px-2.5 text-sm md:text-[15px] font-republic-display transition-colors cursor-pointer ${
               appViewMode === 'community'
-                ? 'text-white font-extrabold bg-white/[0.08] shadow-xs'
-                : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
+                ? 'text-white font-extrabold'
+                : 'text-gray-400 hover:text-white font-medium'
             }`}
           >
-            Community
+            <span className="relative inline-block">
+              <span>Community</span>
+              <span
+                className={`absolute -bottom-1 left-0 right-0 h-[2px] bg-white transition-transform duration-250 origin-center rounded-full ${
+                  appViewMode === 'community'
+                    ? 'scale-x-100'
+                    : 'scale-x-0 group-hover:scale-x-100'
+                }`}
+              />
+            </span>
           </button>
 
           {/* Square Button */}
@@ -196,13 +231,22 @@ export const Navbar: React.FC<NavbarProps> = ({
               playSound('click');
               onSelectAppViewMode('square');
             }}
-            className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-republic-display transition-all cursor-pointer ${
+            className={`group relative py-1.5 px-2.5 text-sm md:text-[15px] font-republic-display transition-colors cursor-pointer ${
               appViewMode === 'square'
-                ? 'text-white font-extrabold bg-white/[0.08] shadow-xs'
-                : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
+                ? 'text-white font-extrabold'
+                : 'text-gray-400 hover:text-white font-medium'
             }`}
           >
-            Square
+            <span className="relative inline-block">
+              <span>Square</span>
+              <span
+                className={`absolute -bottom-1 left-0 right-0 h-[2px] bg-white transition-transform duration-250 origin-center rounded-full ${
+                  appViewMode === 'square'
+                    ? 'scale-x-100'
+                    : 'scale-x-0 group-hover:scale-x-100'
+                }`}
+              />
+            </span>
           </button>
 
           {/* More Dropdown Button */}
@@ -214,14 +258,23 @@ export const Navbar: React.FC<NavbarProps> = ({
                 playSound('click');
                 setIsMoreOpen(prev => !prev);
               }}
-              className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs md:text-sm font-republic-display transition-all cursor-pointer ${
+              className={`group relative flex items-center space-x-1 py-1.5 px-2.5 text-sm md:text-[15px] font-republic-display transition-colors cursor-pointer ${
                 isMoreOpen
-                  ? 'text-white font-extrabold bg-white/[0.08]'
-                  : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
+                  ? 'text-white font-extrabold'
+                  : 'text-gray-400 hover:text-white font-medium'
               }`}
             >
-              <span>More</span>
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isMoreOpen ? 'rotate-180 text-white' : 'text-gray-400'}`} />
+              <span className="relative inline-flex items-center space-x-1">
+                <span>More</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isMoreOpen ? 'rotate-180 text-white' : 'text-gray-400 group-hover:text-white'}`} />
+                <span
+                  className={`absolute -bottom-1 left-0 right-0 h-[2px] bg-white transition-transform duration-250 origin-center rounded-full ${
+                    isMoreOpen
+                      ? 'scale-x-100'
+                      : 'scale-x-0 group-hover:scale-x-100'
+                  }`}
+                />
+              </span>
             </button>
 
             {/* Dropdown Menu */}
@@ -342,59 +395,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </div>
         </nav>
-      </div>
 
-      {/* Right side: Scale controller (in Pro mode), Deposit, Log in */}
+      {/* Right side: Deposit, Log in */}
       <div className="relative z-10 flex items-center space-x-2.5 sm:space-x-3">
-        {/* Pro Terminal Scale / Zoom Controller */}
-        {(appViewMode === 'pro_terminal' || appViewMode === 'trade') && onTerminalScaleChange && (
-          <div className="flex items-center space-x-1 bg-white/[0.03] backdrop-blur-md p-1 rounded-xl border border-white/[0.08]">
-            <span className="text-gray-400 text-[10px] font-medium px-1.5 hidden md:inline">Scale</span>
-            <button
-              id="scale-minus-btn"
-              type="button"
-              onClick={() => {
-                playSound('click');
-                onTerminalScaleChange(Math.max(70, terminalScale - 5));
-              }}
-              title="Scale Down"
-              className="p-1 rounded text-gray-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
-            >
-              <Minus className="w-3 h-3" />
-            </button>
-            {[80, 85, 90, 100].map(s => (
-              <button
-                key={s}
-                id={`scale-preset-${s}`}
-                type="button"
-                onClick={() => {
-                  playSound('click');
-                  onTerminalScaleChange(s);
-                }}
-                className={`px-2 py-0.5 rounded-lg text-[10px] font-republic-mono font-bold transition-all cursor-pointer ${
-                  terminalScale === s
-                    ? 'bg-white text-black shadow-xs'
-                    : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
-                }`}
-              >
-                {s}%
-              </button>
-            ))}
-            <button
-              id="scale-plus-btn"
-              type="button"
-              onClick={() => {
-                playSound('click');
-                onTerminalScaleChange(Math.min(110, terminalScale + 5));
-              }}
-              title="Scale Up"
-              className="p-1 rounded text-gray-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
-            >
-              <Plus className="w-3 h-3" />
-            </button>
-          </div>
-        )}
-
         {/* Deposit Button (Wide & Prominent) */}
         <button
           id="nav-deposit-btn"

@@ -7,6 +7,7 @@ export type MarginType = 'cross' | 'isolated';
 export interface TradingPair {
   symbol: string;         // e.g. "BTC/USDT"
   baseAsset: string;      // e.g. "BTC"
+  name?: string;          // e.g. "Bitcoin"
   quoteAsset: string;     // e.g. "USDT"
   currentPrice: number;
   change24h: number;      // percentage, e.g. +3.42
@@ -18,7 +19,9 @@ export interface TradingPair {
   qtyPrecision: number;   // decimal places for quantity
   minQty: number;
   maxLeverage: number;    // e.g. 100 for BTC, 50 for altcoins
-  category: 'All' | 'Layer 1' | 'DeFi' | 'AI' | 'Meme';
+  category: 'All' | 'Layer 1' | 'DeFi' | 'AI' | 'Meme' | string;
+  marketCap?: number;     // in USD
+  assetType?: 'crypto' | 'stock' | 'etf' | 'commodity';
   fundingRate: number;    // e.g. 0.0001 (0.0100%)
   nextFundingTime: number; // timestamp
 }

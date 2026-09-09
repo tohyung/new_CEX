@@ -52,10 +52,10 @@ export const OrderBook: React.FC<OrderBookProps> = ({
       </div>
 
       {/* Table Column Headers */}
-      <div className="grid grid-cols-12 px-3 py-1.5 text-[10px] text-gray-400 font-medium border-b border-white/[0.08] bg-white/[0.02] shrink-0">
-        <span className="col-span-5 text-left">Price</span>
-        <span className="col-span-3 text-center">Amount</span>
-        <span className="col-span-4 text-right">Total</span>
+      <div className="grid grid-cols-12 px-2.5 py-1 text-[10px] text-gray-400 font-medium border-b border-white/[0.08] bg-white/[0.02] shrink-0">
+        <span className="col-span-5 text-left truncate">Price</span>
+        <span className="col-span-3 text-center truncate">Amount</span>
+        <span className="col-span-4 text-right truncate">Total</span>
       </div>
 
       {/* Asks (Sell Orders - Red) */}
@@ -67,20 +67,20 @@ export const OrderBook: React.FC<OrderBookProps> = ({
               playSound('click');
               onSelectPrice(ask.price, ask.amount);
             }}
-            className="relative grid grid-cols-12 px-3 py-0.5 items-center font-republic-mono text-[11px] cursor-pointer hover:bg-white/[0.05] group transition-colors"
+            className="relative grid grid-cols-12 px-2.5 py-0.5 items-center font-republic-mono text-[11px] cursor-pointer hover:bg-white/[0.05] group transition-colors"
           >
             {/* Red Depth bar behind */}
             <div
               className="absolute right-0 top-0 bottom-0 bg-[#f43f5e]/15 pointer-events-none transition-all duration-200"
               style={{ width: `${ask.depthPercent}%` }}
             />
-            <span className="col-span-5 text-[#f43f5e] font-semibold text-left">
+            <span className="col-span-5 text-[#f43f5e] font-semibold text-left truncate">
               {ask.price.toFixed(precision)}
             </span>
-            <span className="col-span-3 text-gray-200 text-center">
+            <span className="col-span-3 text-gray-200 text-center truncate">
               {ask.amount.toFixed(pair.qtyPrecision)}
             </span>
-            <span className="col-span-4 text-gray-400 text-right">
+            <span className="col-span-4 text-gray-400 text-right truncate">
               {ask.total.toFixed(pair.qtyPrecision)}
             </span>
           </div>
@@ -154,20 +154,20 @@ export const OrderBook: React.FC<OrderBookProps> = ({
               playSound('click');
               onSelectPrice(bid.price, bid.amount);
             }}
-            className="relative grid grid-cols-12 px-3 py-0.5 items-center font-republic-mono text-[11px] cursor-pointer hover:bg-white/[0.05] group transition-colors"
+            className="relative grid grid-cols-12 px-2.5 py-0.5 items-center font-republic-mono text-[11px] cursor-pointer hover:bg-white/[0.05] group transition-colors"
           >
             {/* Green Depth bar behind */}
             <div
               className="absolute right-0 top-0 bottom-0 bg-[#10b981]/15 pointer-events-none transition-all duration-200"
               style={{ width: `${bid.depthPercent}%` }}
             />
-            <span className="col-span-5 text-[#10b981] font-semibold text-left">
+            <span className="col-span-5 text-[#10b981] font-semibold text-left truncate">
               {bid.price.toFixed(precision)}
             </span>
-            <span className="col-span-3 text-gray-300 text-right">
+            <span className="col-span-3 text-gray-300 text-center truncate">
               {bid.amount.toFixed(pair.qtyPrecision)}
             </span>
-            <span className="col-span-4 text-gray-400 text-right">
+            <span className="col-span-4 text-gray-400 text-right truncate">
               {bid.total.toFixed(pair.qtyPrecision)}
             </span>
           </div>
